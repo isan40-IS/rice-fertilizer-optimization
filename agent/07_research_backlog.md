@@ -1,0 +1,99 @@
+# 07 — Research Backlog and Experiments
+
+## Prioritization Rules
+- **P0:** necessary to honor current supervisor direction or prevent scientifically invalid optimization.
+- **P1:** important to evaluate and interpret optimization once a baseline is running.
+- **P2:** useful model enhancement or exploratory diagnostics that should not block immediate optimization by default.
+
+Backlog items are proposals, not approval to modify the current dataset/methodology. Prefer smaller tests that isolate a single hypothesis.
+
+## P0 — Baseline Verification and Initial Optimization
+
+### TASK-001 — Verify Latest Experiment Artifacts
+**Goal:** Establish a reproducible current baseline.
+**Actions:** Find dataset file/hash, feature list, actual output metrics, split/group assignments, best estimator/bundle, preprocessing behavior, config snapshot, seeds.
+**Acceptance:** A concise machine-readable run summary with paths and actual holdout/CV metrics; no guessed values.
+**Progress 2026-11-17:** Dataset/hash, 11 inputs, both cohort metrics, split IDs/no group overlap, bundles and preprocessing verified. A machine-readable immutable manifest, effective notebook overrides and full 1,000-row generation lineage remain pending; acceptance is not fully met.
+
+### TASK-002 — Audit Native Missing Pipeline
+**Goal:** Ensure XGBoost/CatBoost actually use the intended missing-value pathway.
+**Actions:** Inspect active pipeline and sample transformed model input; inspect fit/predict compatibility; run focused tests.
+**Acceptance:** The full inference path for missing state features is traceable and matches experimental claims.
+**Progress 2026-11-17:** Audit completed and mismatch verified (FIND-007); corrected native execution is pending. Proposed correction: explicitly handle resolver `none` and pass `imputation_mode` through callers; verify missing values reach intended estimators and inference matches training. Preserve cohort/group design and historical artifacts. This entry alone does not authorize implementation or retraining.
+
+### TASK-003 — Check Optimization Readiness
+**Goal:** Ensure trained surrogate can score candidate N/P/K consistently.
+**Actions:** Inspect feature order/units, derived NPK recomputation, state-feature handling, missing values, baseline-dose construction, model bundle loading.
+**Acceptance:** Repeated calls with unchanged inputs are reproducible; changing dose changes the intended fields only; no unexpected NaNs/errors.
+**Progress 2026-11-17:** Bundle schema and candidate NPK recomputation inspected; runtime dose-response checks remain pending. Include fertilizer-type consistency when doses change, large ratios near zero denominators, baseline context policy and training support.
+
+### TASK-004 — Execute First Differential Evolution Baseline
+**Goal:** Produce first feasible model-based N/P/K recommendations on fixed state scenarios.
+**Actions:** Validate bounds/penalties; run with controlled seeds; compare with baseline; save objective, N/P/K, predicted yields, predicted delta, constraint/penalty diagnostics.
+**Acceptance:** Reproducible experiment with no fabricated parameters and explicit limitations.
+**Progress 2026-11-17:** Implementation located; no DE run performed. Current enabled objective requires unset `yield_scale`, `lambda_total`, `lambda_composition`. Resolve researcher decisions/readiness first; do not invent values or disable terms silently.
+
+## P1 — Optimization Trustworthiness
+
+### TASK-005 — Fertilizer Response Diagnostics
+**Question:** Does the surrogate respond meaningfully to N/P/K variation at a fixed state?
+**Method:** One-at-a-time and limited joint dose sweeps inside supported ranges; show curves and data-support diagnostics.
+**Risk:** Model response is associational, not a measured causal response.
+
+### TASK-006 — Constraint and Boundary Diagnostics
+**Question:** Do optimized doses crowd against boundaries or unusual composition patterns?
+**Method:** Report boundary distances, total dose, NPK proportions, feasible rate, and sensitivity to penalty choices.
+
+### TASK-007 — Stability and Sensitivity
+**Question:** Are recommendations stable across DE seeds and small realistic state perturbations?
+**Method:** Separate algorithm stability from input stability; honor configured seed schemes where valid; preserve scenario eligibility.
+
+### TASK-008 — Agronomic Plausibility Review
+**Question:** Are dose ranges and predicted responses reasonable for the dataset/domain?
+**Method:** Literature-supported checks and expert feedback; document decisions and unresolved concerns.
+
+## P2 — Prediction Research Backlog
+
+### TASK-009 — Diagnose Horizontal Prediction Bands
+**Question:** Are repeated predictions model structure, feature compression, missingness effects, or visualization artifacts?
+**Method:** Compare predicted-value precision/counts, distribution plots, experiment-wise residuals, feature duplication, and fixed-state dose sweeps.
+**Decision gate:** Only modify model if there is evidence that banding harms generalization or optimization suitability.
+**Progress 2026-11-17:** 192 holdout rows have 46 unique raw/transformed feature combinations and 42 unique XGBoost predictions (FIND-004). Supports repeated-input explanation without explaining every visual band; no row deletion.
+
+### TASK-010 — Controlled Missingness/Feature Ablations
+**Question:** Which change was responsible for better performance?
+**Method:** Under matched train/test groups, compare one factor at a time: feature profile, native missing handling, imputation, row cohort. Do not add row deletions to the active baseline.
+**Caution:** Keep dataset/population differences explicit and avoid unfair comparisons.
+
+### TASK-011 — Broader Feature Importance Study (Nesha's Suggestion)
+**Question:** Which measured or proxy variables contribute to predictive utility, and are dose/state features meaningful?
+**Method:** Train one interpretable baseline on a scientifically valid broader feature set if feasible; use permutation/group-aware importance and stability; inspect correlated features and leakage risks.
+**Caution:** Importance does not establish causal fertilizer response and should not alone decide which essential state variables to drop.
+
+### TASK-012 — Evaluate Optuna vs RandomizedSearchCV (Nesha's Suggestion)
+**Question:** Does adaptive search improve validated performance per unit compute?
+**Method:** Same dataset, folds, target, search space, scoring, and comparable time/trial budget. Report validation vs holdout separately.
+**Decision gate:** Adopt only if gains and implementation complexity justify it. Do not let tuning delay the optimization milestone without a concrete reason.
+
+### TASK-013 — MILP Data-Selection Audit (Earlier Report: MILM)
+**Question:** How did row selection change study/year/dose/target coverage?
+**Method:** Compare included/excluded groups and distributions, inspect algorithm and criteria, preserve original IDs and processing manifest.
+**Restriction:** This is an audit, not permission to delete more rows from the active dataset.
+**Progress 2026-11-17:** MILP algorithm/stored 800-row run located; 1,000-row cohort statistics/hash verified (FIND-005). Exact generation settings, solver evidence and full retained/excluded coverage comparison remain pending.
+
+## Additional Corrective Proposals
+
+### TASK-014 - Experiment Selection and Effective-Config Traceability (P0)
+**Problem:** Model override loses selection weights (FIND-008); notebook mixes cohort/run references and snapshots omit overrides (FIND-009).
+**Method:** Preserve explicit weights/effective settings; bind analyses to dataset hash and saved splits. Keep historical artifacts unchanged; review winner after comparable evidence is available.
+**Acceptance:** Intended weights recorded, ranking traceable, each analysis linked to one cohort/run. This does not preselect an estimator.
+
+### TASK-015 - Revalidate Current Tests (P1)
+**Problem:** Existing tests use old interface/config assumptions (FIND-010).
+**Method:** Update focused tests when implementation work is authorized; verify meaningful native-input preservation/selection regression checks and report actual execution results.
+**Limit:** No tests were modified or executed by the documentation update.
+
+## Next-Task Selection
+**Recommended after audit (not executed):** finish TASK-001 provenance -> TASK-002 and TASK-014 correction -> necessary matched-cohort comparison and explicit surrogate selection -> TASK-003 with minimal TASK-005 response checks -> resolve open coefficients/bounds/baseline -> TASK-004. Keep corrective work bounded to support the optimization milestone. Broad feature search/Optuna remain P2. Researcher approval is required for scientific configuration changes.
+
+After each experiment, record: hypothesis, dataset and split, exact modification, verification artifact, outcome, uncertainty, decision, and whether it changes the active baseline.

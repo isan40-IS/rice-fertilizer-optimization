@@ -15,6 +15,4 @@ artifacts/*
 .DS_Store
 Thumbs.db
 notebooks/*
-AGENTS.md
-agents/
 rice_fertilizer_optimization.egg-info

@@ -1,0 +1,98 @@
+# 06 — Research Findings and Diagnostic Evidence
+
+## Evidence Standard
+- **Verified:** directly inspected in current data/code/output.
+- **Reported:** researcher described the observation, original output not yet inspected here.
+- **Hypothesis:** plausible explanation requiring tests.
+- **Interpretation:** reasoned implication, not an observed causal mechanism.
+
+Do not upgrade a finding's evidence status without checking the cited artifact.
+
+## FIND-001 — Extensive Missingness in Soil/Environment Features
+**Audit addition (verified, 2026-11-17):** Current `data/processed/model_dataset.csv` has 1,682 rows: missing pH 68.25%, SOC 70.63%, precipitation 46.08%. Configured 1,000-row cohort: 46.60%, 50.60%, 22.00%. Original percentages below remain historical, reported values.
+
+**Historical report status (audit additions above take precedence):** Reported, supported by earlier research exploration.
+**Observation:** Several soil/environment variables have high missingness. Earlier analyses cited roughly 63.7% for `initial.ph.soil`, 67.3% for `soc.percentage`, and 79.7% for `clay.perc1` in an earlier data state. These percentages must not be assumed to describe the new selected dataset.
+**Implication:** Imputation, native missing handling, feature inclusion, and row selection can materially change the training sample and inferred patterns.
+**Caution:** Missingness mechanism (MCAR/MAR/MNAR) is not established simply by these rates.
+**Next evidence:** Current missingness tables, per-study breakdown, and post-selection comparison.
+
+## FIND-002 — Overlap Structure Changes Feature-Availability Trade-offs
+**Status:** Reported.
+**Observation:** A missingness matrix showed that some `..._Source` attributes contain many observed values, while records missing such source values can contain useful observations in `avprec.mm`, `soc.percentage`, or `initial.ph.soil`.
+**Researcher interpretation:** Prefer keeping scientifically useful state-variable measurements rather than maximizing marginal completeness of source-related attributes.
+**Caution:** Precise list of source fields, joint intersection counts, and effect on sample retention are not yet independently verified.
+**Next evidence:** Pairwise/joint completeness counts and record-ID coverage by experimental group.
+
+## FIND-003 — Native Missing and Minimalist Dataset Associated With Better Scores
+**Audit correction (2026-11-17):** Original report below is retained as history, not a verified native-handling result. In `artifacts/exp_A_comp_miss_val_mech_minimalist/metrics/model_comparison.csv`, XGBoost has CV R2 0.647536 / holdout R2 0.724958, MAE 1064.934 and RMSE 1472.128 kg/ha; CatBoost has CV R2 0.632722 / holdout R2 0.726492, MAE 1060.367 and RMSE 1468.018 kg/ha. FIND-007 confirms MICE in both native-labeled bundles. Native-handling benefits are not established. Separate 800-row results appear in `05_current_state.md`; comparisons across cohorts do not isolate an intervention.
+
+**Historical report status (audit additions above take precedence):** Reported.
+**Observation:** The experiment using the new minimalist dataset and native XGBoost/CatBoost missing handling reportedly achieved R² around 0.72 and MAE/RMSE around 1,000–1,200 kg/ha.
+**Source:** `notebooks/2_model_experiment/experiment_A.ipynb`, according to researcher.
+**Interpretation:** The new *configuration as a whole* appears more promising than the earlier reported high-error pipeline.
+**Not established:** Which individual intervention caused the improvement. Model, features, missing handling, and row selection changed together.
+**Next evidence:** Actual notebook output, model-specific folds/holdout metrics, and comparable old experimental results.
+
+## FIND-004 — Horizontal Bands in Predicted Yield
+**Audit addition (verified numerical diagnostic, 2026-11-17):** The 1,000-row run has 192 holdout rows, 46 unique raw and transformed feature combinations, and 42 unique XGBoost predictions (CatBoost: 46). Source: configured dataset joined by `row_index` to the run's `metrics/*_holdout_predictions.csv`, plus fitted XGBoost preprocessing. Saved targets match dataset targets. This supports repeated inputs as one explanation; it does not explain every visual band. No new plot inspection/response sweep or row deletion occurred.
+
+**Historical report status (audit additions above take precedence):** Reported; root cause unknown.
+**Observation:** Predicted values cluster into horizontal stripes near several yield levels in an actual-versus-predicted scatter plot (researcher mentions around 5,000, 7,000, 8,000 kg/ha).
+**Plausible hypotheses (not findings):**
+1. Tree-ensemble piecewise-constant predictions and repeated leaf/ensemble outputs.
+2. Multiple rows sharing identical or near-identical effective feature values.
+3. Missingness patterns or feature compression limiting model discrimination.
+4. Study/experiment structure or target clusters.
+5. Plotting/rounding/aggregation artifact.
+
+**Discriminating diagnostics:**
+- Inspect distinct predicted values, frequency table, and numeric precision; check if apparent bands are exact repeats or visual clustering.
+- Plot residuals and predicted-value histogram by model and by experimental group.
+- Compare train, CV/holdout, and subgroups; inspect effective features for repeatedly predicted samples.
+- Check whether groups or missingness indicators explain clustering.
+- Perturb N/P/K at fixed state to inspect local surrogate response across dose ranges.
+
+**Do not conclude** that the model is incorrect solely because of banding; assess predictive utility and response behavior.
+
+## FIND-005 — Row Selection Can Bias the Analyzed Population
+**Audit addition (verified cohort shift, 2026-11-17):** Current pre-balancing dataset has 1,682 rows / 28 articles / 350 groups / mean yield 5136.99 kg/ha. Configured 1,000-row cohort has 16 articles / 266 groups / mean yield 4420.09 kg/ha. Composition shift is observed; its bias magnitude and causal contribution to scores are not established.
+**Implementation evidence:** `notebooks/exploration_notebooks/02_balancing_data.ipynb` uses MILP with exact row count, complete target/NPK eligibility, soft missing limits and an excess-missingness objective. It has no article/group/dose/yield balancing objective. Stored 800-row output reports optimality but exceeds all three limits: SOC 38.25% vs 20%, pH 33.25% vs 20%, precipitation 27.50% vs 10%. Exact 1,000-row generation parameters remain open. MILM wording below is historical.
+
+**Historical report status (audit additions above take precedence):** Methodological risk, not demonstrated failure.
+**Basis:** The researcher used MILM to retain a targeted subset with reduced missingness.
+**Risk:** Differences in location, year, experiment, target distribution, or fertilizer treatment coverage may limit representativeness.
+**Suggested audit without deleting more rows:** Compare retained vs excluded rows, target distribution, dose distributions, year/group coverage, missingness, and covariate support.
+
+## FIND-006 — Yield Prediction Accuracy Is Not Equivalent to Optimization Validity
+**Status:** Scientific principle from the thesis design and surrogate-model limitations.
+**Reasoning:** Predicting yield across heterogeneous land conditions differs from estimating how predicted yield changes when only fertilizer dose changes. An optimizer may exploit model artifacts in sparsely observed regions.
+**Diagnostics:** Fixed-state response curves, constraint checks, nearest-training-support or density checks, consistency across seeds/models/scenarios, and expert review.
+
+## FIND-007 — Native Missing Handling Must Be Verified in the Pipeline
+**Status:** Verified implementation/label mismatch, 2026-11-17; supersedes earlier unknown status.
+**Code evidence:** `modeling/imputation.py` accepts `none` but appends it to `mice_columns`. Experiment A computes `imputation_mode` but omits it from `build_model_pipeline()`, whose default is `plan`; main `trainer.py` also uses that default.
+**Artifact evidence:** Inspected native-labeled XGBoost/CatBoost bundles under both minimalist runs contain BayesianRidge IterativeImputer on all seven profile numeric features, plus categorical most-frequent imputation and one-hot encoding. On the 1,000-row XGBoost holdout, 267 missing input entries become zero after transformation.
+**Interpretation:** Existing labels/metrics do not demonstrate native missing handling. Nominal native/imputation branches also provide different numeric predictor sets to MICE; this is not the intended ablation. One-hot categoricals are not native CatBoost categorical handling.
+**Limits:** Bundles were loaded/preprocessing transformed, with no refitting or corrected experiment.
+**Next step:** Focused missing-preservation and fit/predict checks after separately authorized implementation correction; preserve cohort/group design and historical artifacts.
+
+## FIND-008 - Experiment-A Selection Settings Lost
+**Status:** Verified, 2026-11-17.
+**Evidence:** Notebook replaces `configs["models"]` with specifications and calls `rank_models(..., model_cfg.get("selection", {}))`. Weights are absent; `model_selector.py` adds no weighted terms to initial zero scores. Both minimalist metric CSVs show all-zero scores and select `xgboost_native`.
+**Interpretation:** Stored selection does not demonstrate superiority under intended ranking; this does not automatically invalidate every prediction/metric.
+**Next step:** Preserve explicit selection configuration and review selection against comparable, corrected evidence. No replacement winner was approved.
+
+## FIND-009 - Notebook Provenance and Optimization Readiness
+**Status:** Verified code/output observations, 2026-11-17.
+**Evidence:** Experiment-A training names the 800-row `_383327` run; later comparisons reference the 1,000-row run and `ta_20261111T010140Z`. Snapshots are created before notebook model overrides. Later group analysis searches `configs/`, whereas normal snapshots use `config_snapshot/`, and can fall back to project settings. Snapshots alone do not capture all effective notebook settings.
+**Optimization evidence:** DE, candidate NPK rebuilding and evaluation exist. `yield_scale`, `lambda_total`, `lambda_composition` remain null while corresponding options are enabled; objective construction requires these values. Perturbations/validation thresholds remain unset. Group-mean baseline uses context doses, not yield values; unseen-group policy remains open.
+**Limit:** Implementation existence does not prove completed DE, agronomic validation or runtime response correctness. No DE was run during the audit.
+
+## FIND-010 - Historical Test Claims Need Revalidation
+**Status:** Verified static interface/assumption mismatch, 2026-11-17.
+**Evidence:** `tests/integration/test_model_pipeline.py` calls an older pipeline interface; `tests/e2e/test_smoke_configuration.py` expects null profile/bounds despite current settings. `docs/VALIDATION_STATUS.md` records historical checks.
+**Limit:** Pytest was not executed; no current pass/fail count is asserted. Repair/revalidation is proposed work.
+
+## Finding Template
+`FIND-XXX | Date | Evidence status | Observation | Source/artifact | Interpretation | Alternative explanations | Limitations | Next verification`.
