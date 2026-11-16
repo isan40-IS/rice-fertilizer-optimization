@@ -1,0 +1,7 @@
+project_root: .
+data_root: data
+artifacts_root: artifacts
+input_csv: data/input/data.csv
+interim_dir: data/interim
+processed_dir: data/processed
+processed_dataset: data/processed/model_dataset_balanced_1000_minimalist_504622.csv

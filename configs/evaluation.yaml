@@ -1,0 +1,23 @@
+epsilon: 0.00000001
+
+marginal_step:
+  method: "range_fraction"
+  value: 0.02
+  minimum_step: 1.0
+
+sensitivity:
+  enabled: true
+  common_seeds: [11, 29, 47]
+  aggregate: "median"
+  scenario_limit: 10
+
+input_stability:
+  enabled: true
+  random_perturbations: 20
+  random_seed: 42
+  fraction_of_iqr: null
+  scenario_limit: 10
+
+algorithm_stability:
+  enabled: true
+  seeds: [11, 29, 47, 71, 101]

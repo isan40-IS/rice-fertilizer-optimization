@@ -1,0 +1,93 @@
+# KEPUTUSAN ILMIAH — WAJIB DITINJAU SEBELUM EKSPERIMEN UTAMA.
+# Nilai null sengaja dikosongkan karena tidak boleh diputuskan hanya oleh kode.
+
+feature_engineering:
+  # Pseudocount pada rasio N/(P+c), N/(K+c), dan P/(K+c).
+  # Isi dan jelaskan agar pembagian ketika denominator=0 tidak menghasilkan nilai ekstrem.
+  ratio_pseudocount: 1e-5
+
+# Pilih salah satu profil pada configs/features.yaml.
+feature_profile: "minimalist_features"
+
+# Contoh: group_kfold. Lihat configs/validation.yaml.
+validation_strategy: "group_kfold"
+
+# Diperlukan untuk validasi berbasis kelompok.
+# Kandidat utama: group_article_experiment.
+group_column: "group_article_experiment"
+
+target_column: "yield.wb.kg_ha"
+
+# Pilihan: observed, zero, group_mean, historical_best.
+baseline_policy: "group_mean"
+
+# State Variable Imputation
+state_imputation:
+  # Metode default untuk state feature yang TIDAK disebut eksplisit
+  default_method: "median"
+
+  # Konfigurasi MICE dilakukan bersama dan saling menjadi predictor
+  mice_shared:
+    # Nama estimator untuk IterativeImputer.
+    # Pilihan yang didukung kode: "bayesian_ridge", "extra_trees", "decision_tree".
+    estimator: "bayesian_ridge"
+    max_iter: 10
+    tol: 0.001
+    initial_strategy: "median"   # imputasi awal sebelum iterasi MICE dimulai
+    random_state: 42
+
+  # Keputusan per-kolom secara eksplisit menggunakan metode imputasi apa
+  # Pilihan (Numerik): "median" | "most_frequent" | "mice"
+  # Pilihan (Kategorikal): "most_frequent"
+  columns:
+    initial.ph.soil:
+      method: "mice"      
+    soc.percentage:
+      method: "mice"
+    avprec.mm:
+      method: "mice"
+    fertilizer_type:
+      method: "most_frequent"
+
+
+optimization:
+  bounds:
+    N: {min: 60, max: 180}
+    P: {min: 6.5, max: 17.5}
+    K: {min: 25, max: 83}
+
+  # total_soft: ambang mulai dikenai penalti.
+  # total_max: batas keras total N+P+K jika hard constraint aktif.
+  total_soft: 200
+  total_max: 300
+
+  proportion_bounds:
+    N: {min: 0.45, max: 0.75}
+    P: {min: 0.05, max: 0.20}
+    K: {min: 0.15, max: 0.40}
+
+  lambda_total: null
+  lambda_composition: null
+
+  # Skala objective, misalnya IQR yield training. Diperlukan jika normalisasi aktif.
+  yield_scale: null
+
+  enable_total_penalty: true
+  enable_composition_penalty: true
+  enable_total_hard_constraint: true
+
+perturbations:
+  initial.ph.soil: {method: "absolute", value: null}
+  avprec.mm: {method: "iqr_fraction", value: null}
+  soc.percentage: {method: "iqr_fraction", value: null}
+  som.percentage: {method: "iqr_fraction", value: null}
+
+agronomic_validation:
+  # Jarak relatif dari lower/upper bound yang diberi warning, misalnya 0.05.
+  boundary_warning_fraction: null
+
+  # Ambang nearest-neighbor distance pada ruang fitur numerik terstandardisasi.
+  max_training_distance: null
+
+  # Ambang rata-rata squared normalized recommendation shift.
+  max_input_stability_index: null

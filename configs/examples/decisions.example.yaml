@@ -1,0 +1,48 @@
+# DUMMY EXAMPLE ONLY — NOT AN AGRONOMIC RECOMMENDATION.
+feature_engineering:
+  ratio_pseudocount: 1.0
+feature_profile: core_candidate
+validation_strategy: group_kfold
+group_column: group_article_experiment
+target_column: yield.wb.kg_ha
+baseline_policy: observed
+optimization:
+  bounds:
+    N:
+      min: 0.0
+      max: 200.0
+    P:
+      min: 0.0
+      max: 100.0
+    K:
+      min: 0.0
+      max: 150.0
+  total_soft: 250.0
+  total_max: 350.0
+  proportion_bounds:
+    N:
+      min: 0.2
+      max: 0.8
+    P:
+      min: 0.05
+      max: 0.5
+    K:
+      min: 0.05
+      max: 0.6
+  lambda_total: 1.0
+  lambda_composition: 1.0
+  yield_scale: 1000.0
+  enable_total_penalty: true
+  enable_composition_penalty: true
+  enable_total_hard_constraint: true
+perturbations:
+  initial.ph.soil:
+    method: absolute
+    value: 0.2
+  avprec.mm:
+    method: iqr_fraction
+    value: 0.05
+agronomic_validation:
+  boundary_warning_fraction: 0.05
+  max_training_distance: null
+  max_input_stability_index: null

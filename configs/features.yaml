@@ -1,0 +1,204 @@
+decision_features:
+  - "N.rate.kg_ha"
+  - "P.rate.kg_ha"
+  - "K.rate.kg_ha"
+
+engineered_features:
+  - "total_npk"
+  - "ratio_n_p"
+  - "ratio_n_k"
+  - "ratio_p_k"
+  - "prop_n"
+  - "prop_p"
+  - "prop_k"
+
+profiles:
+  core_candidate:
+    description: "High-coverage candidate from the initial EDA; still provisional."
+    numeric:
+      - "N.rate.kg_ha"
+      - "P.rate.kg_ha"
+      - "K.rate.kg_ha"
+      - "avprec.mm"
+      - "total_npk"
+      - "ratio_n_p"
+      - "ratio_n_k"
+      - "ratio_p_k"
+    categorical:
+      - "soil_type"
+      - "fertilizer_type"
+
+  extended_candidate:
+    description: "Adds lower-coverage state variables; review imputation and support."
+    numeric:
+      - "N.rate.kg_ha"
+      - "P.rate.kg_ha"
+      - "K.rate.kg_ha"
+      - "avprec.mm"
+      - "initial.ph.soil"
+      - "soc.percentage"
+      - "som.percentage"
+      - "avtemp.Cdegree"
+      - "total_npk"
+      - "ratio_n_p"
+      - "ratio_n_k"
+      - "ratio_p_k"
+    categorical:
+      - "soil_type"
+      - "fertilizer_type"
+
+  source_enriched_candidate:
+    description: "Adds nutrient-source categories; check proxy leakage."
+    numeric:
+      - "N.rate.kg_ha"
+      - "P.rate.kg_ha"
+      - "K.rate.kg_ha"
+      - "avprec.mm"
+      - "total_npk"
+      - "ratio_n_p"
+      - "ratio_n_k"
+      - "ratio_p_k"
+    categorical:
+      - "soil_type"
+      - "fertilizer_type"
+      - "N_source"
+      - "P_source"
+      - "K_source"
+
+  more_soil:
+    description: "Nutrients and more soil features; without engineered_features"
+    numeric:
+    - "N.rate.kg_ha"
+    - "P.rate.kg_ha"
+    - "K.rate.kg_ha"
+    - "initial.ph.soil"
+    - "final.ph.soil"
+    - "initial.ec.soil.dS_m"
+    - "final.ec.soil.dS_m"
+    - "som.percentage"
+    - "soc.percentage"
+    - "clay.perc1"
+    - "bd.1"
+    - "N.nitrate.soil.layer1"
+    - "P.soil.layer1"
+    - "K.soil.layer1"
+    categorical:
+      - "soil_type"
+      - "fertilizer_type"
+
+  more_env:
+    description: "Nutrients and more env features; without engineered_features"
+    numeric:
+    - "N.rate.kg_ha"
+    - "P.rate.kg_ha"
+    - "K.rate.kg_ha"
+    - "avtemp.Cdegree"
+    - "avprec.mm"
+    - "elevation.m"
+    - "slope.perc"
+    categorical:
+      - "soil_type"
+      - "fertilizer_type"
+
+  advanced_imputation:
+    description: "Adds features that can be handling with advanced_imputation; rows>20% total rows."
+    numeric:
+    - "N.rate.kg_ha"
+    - "P.rate.kg_ha"
+    - "K.rate.kg_ha"
+    - "initial.ph.soil"
+    - "avprec.mm"
+    - "soc.percentage"
+    - "clay.perc1"
+    - "total_npk"
+    - "ratio_n_p"
+    - "ratio_n_k"
+    - "ratio_p_k"
+    categorical:
+      - "soil_type"
+      - "fertilizer_type"
+      - "N_source"
+      - "P_source"
+      - "K_source"
+
+  model_based_imputation:
+    description: "Adds features that can be handling with model_based_imputation; rows>10% total rows."
+    numeric:
+    - "N.rate.kg_ha"
+    - "P.rate.kg_ha"
+    - "K.rate.kg_ha"
+    - "initial.ph.soil"
+    - "avprec.mm"
+    - "avtemp.Cdegree"
+    - "soc.percentage"
+    - "clay.perc1"
+    - "som.percentage"
+    - "initial.ec.soil.dS_m"
+    - "bd.1"
+    - "total_npk"
+    - "ratio_n_p"
+    - "ratio_n_k"
+    - "ratio_p_k"
+    categorical:
+    - "soil_type"
+    - "fertilizer_type"
+    - "N_source"
+    - "P_source"
+    - "K_source"
+  
+  modeling_features:
+    description: "Adds features that can be handling with advanced_imputation; without decision_features."
+    numeric:
+    - "initial.ph.soil"
+    - "avprec.mm"
+    - "soc.percentage"
+    - "clay.perc1"
+    - "total_npk"
+    - "ratio_n_p"
+    - "ratio_n_k"
+    - "ratio_p_k"
+    categorical:
+      - "soil_type"
+      - "fertilizer_type"
+      - "N_source"
+      - "P_source"
+      - "K_source"
+
+  ablation_no_state:
+    description: "modeling_features but no soil and feature profiles to check its impact."
+    numeric:
+    - "total_npk"
+    - "ratio_n_p"
+    - "ratio_n_k"
+    - "ratio_p_k"
+    categorical:
+      - "fertilizer_type"
+      - "N_source"
+      - "P_source"
+      - "K_source"
+
+  minimalist_features:
+    description: "After experiment A, I examined the Missing Data Matrix and decided to remove features that were burdensome, while retaining those that were necessary based on logical requirements rather than feature importance."
+    numeric:
+    - "initial.ph.soil"
+    - "avprec.mm"
+    - "soc.percentage"
+    - "total_npk"
+    - "ratio_n_p"
+    - "ratio_n_k"
+    - "ratio_p_k"
+    categorical:
+      - "fertilizer_type"
+      
+
+candidate_state_features:
+  - "soil_type"
+  - "fertilizer_type"
+  - "avprec.mm"
+  - "initial.ph.soil"
+  - "soc.percentage"
+  - "som.percentage"
+  - "avtemp.Cdegree"
+  - "N_source"
+  - "P_source"
+  - "K_source"

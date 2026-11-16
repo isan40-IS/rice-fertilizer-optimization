@@ -1,0 +1,48 @@
+read_csv:
+  sep: ","
+  encoding: "utf-8"
+  low_memory: false
+  missing_tokens: ["NA", "N/A", "na", "n/a", "NULL", "null", ""]
+
+crop:
+  column: "crop"
+  accepted_labels: ["Rice"]
+  case_sensitive: false
+
+target_column: "yield.wb.kg_ha"
+
+identifier_columns:
+  record_id: "record_id"
+  article_id: "id"
+  experiment_id: "exp.id"
+  year: "year"
+  location: "location"
+
+numeric_columns:
+  - "N.rate.kg_ha"
+  - "P.rate.kg_ha"
+  - "K.rate.kg_ha"
+  - "yield.wb.kg_ha"
+  - "avprec.mm"
+  - "initial.ph.soil"
+  - "soc.percentage"
+  - "som.percentage"
+  - "avtemp.Cdegree"
+  - "clay.perc1"
+  - "bd.1"
+
+nutrient_rates:
+  N: "N.rate.kg_ha"
+  P: "P.rate.kg_ha"
+  K: "K.rate.kg_ha"
+
+structural_zero:
+  enabled: true
+  indicator_column: "Nutrients applied (NPKS)"
+  control_labels: ["CONTROL", "NONE", "NO FERTILIZER", "0", "No fertilizer"]
+  # Ambiguous descriptive labels should be added after reviewing the audit output.
+  explicit_label_map: {}
+
+runtime_output:
+  save_csv: true
+  save_parquet: true
