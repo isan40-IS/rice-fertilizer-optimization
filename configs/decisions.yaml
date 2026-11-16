@@ -6,6 +6,8 @@ feature_engineering:
   # Isi dan jelaskan agar pembagian ketika denominator=0 tidak menghasilkan nilai ekstrem.
   ratio_pseudocount: 1e-5
 
+# Experiment B: broad metadata-based candidates on the same 1000 reference IDs.
+# Diagnostic profile; not an automatically approved optimization surrogate.
 # Pilih salah satu profil pada configs/features.yaml.
 feature_profile: "minimalist_features"
 
@@ -21,33 +23,13 @@ target_column: "yield.wb.kg_ha"
 # Pilihan: observed, zero, group_mean, historical_best.
 baseline_policy: "group_mean"
 
-# State Variable Imputation
+# Pengendali imputasi untuk semua model dan notebook.
+# none: tanpa imputer; NaN numerik diteruskan ke estimator.
+# plan: metode per fitur; contoh MICE di configs/examples/decision.example.yaml.
 state_imputation:
-  # Metode default untuk state feature yang TIDAK disebut eksplisit
-  default_method: "median"
-
-  # Konfigurasi MICE dilakukan bersama dan saling menjadi predictor
-  mice_shared:
-    # Nama estimator untuk IterativeImputer.
-    # Pilihan yang didukung kode: "bayesian_ridge", "extra_trees", "decision_tree".
-    estimator: "bayesian_ridge"
-    max_iter: 10
-    tol: 0.001
-    initial_strategy: "median"   # imputasi awal sebelum iterasi MICE dimulai
-    random_state: 42
-
-  # Keputusan per-kolom secara eksplisit menggunakan metode imputasi apa
-  # Pilihan (Numerik): "median" | "most_frequent" | "mice"
-  # Pilihan (Kategorikal): "most_frequent"
-  columns:
-    initial.ph.soil:
-      method: "mice"      
-    soc.percentage:
-      method: "mice"
-    avprec.mm:
-      method: "mice"
-    fertilizer_type:
-      method: "most_frequent"
+  mode: "none"
+  default_method: "none"
+  columns: {}
 
 
 optimization:

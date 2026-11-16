@@ -24,7 +24,7 @@ _VALID_METHODS = {"median", "most_frequent", "mice", "none",}
 class ResolvedImputationPlan:
     """
     Fully resolved imputation plan for every state feature the caller
-    asked about. Columns are partitioned into three disjoint groups by
+    asked about. Columns are partitioned into four disjoint groups by
     method — this partition is what pipeline_factory consumes to
     build the ColumnTransformer branches.
     """
@@ -32,6 +32,19 @@ class ResolvedImputationPlan:
     most_frequent_columns: tuple[str, ...]
     mice_columns: tuple[str, ...]
     mice_params: dict
+    none_columns: tuple[str, ...] = ()
+    mode: str = "plan"
+
+
+def resolve_imputation_mode(decisions: dict) -> str:
+    """Read the global switch; legacy configurations retain plan behavior."""
+    settings = decisions.get("state_imputation")
+    if not isinstance(settings, dict):
+        raise ConfigurationError("decisions.yaml requires state_imputation settings")
+    mode = settings.get("mode", "plan")
+    if mode not in {"plan", "none"}:
+        raise ConfigurationError("state_imputation.mode must be 'plan' or 'none'")
+    return mode
 
 
 def _build_mice_estimator(estimator_name: str | None):
@@ -61,6 +74,7 @@ def resolve_imputation_plan(
 
     Raises ConfigurationError if:
       - state_imputation section is missing from decisions.yaml,
+      - global mode is not plan/none,
       - a decision variable (N/P/K rate) or the target column is
         explicitly configured under state_imputation.columns,
       - a state feature has no resolvable method (neither a column
@@ -72,6 +86,7 @@ def resolve_imputation_plan(
         missing or unknown.
     """
     decision_columns = set(nutrient_rate_columns.values())
+    mode = resolve_imputation_mode(decisions)
     state_imputation = decisions.get("state_imputation")
     if state_imputation is None:
         raise ConfigurationError(
@@ -101,12 +116,17 @@ def resolve_imputation_plan(
     median_columns: list[str] = []
     most_frequent_columns: list[str] = []
     mice_columns: list[str] = []
+    none_columns: list[str] = []
 
     for column in all_features:
         if column in decision_columns or column == target_column:
             continue  # out of scope for this module by design
 
-        method = columns_cfg.get(column, {}).get("method") or default_method
+        # Global none is authoritative, even if legacy per-column settings remain.
+        method = "none" if mode == "none" else (
+            columns_cfg.get(column, {}).get("method")
+            or ("most_frequent" if column in categorical_set else default_method)
+        )
         if method is None:
             raise ConfigurationError(
                 f"No imputation method resolved for '{column}'. Set "
@@ -118,18 +138,19 @@ def resolve_imputation_plan(
                 f"Unknown imputation method '{method}' for '{column}'. "
                 f"Choose one of: {sorted(_VALID_METHODS)}"
             )
-        if method == "mice" and column in categorical_set:
+        if method not in {"none", "most_frequent"} and column in categorical_set:
             raise ConfigurationError(
-                f"'{column}' is categorical; IterativeImputer ('mice') cannot "
-                "model string categories directly. Use 'most_frequent' instead."
+                f"'{column}' is categorical; use 'most_frequent' or 'none'."
             )
 
         if method == "median":
             median_columns.append(column)
         elif method == "most_frequent":
             most_frequent_columns.append(column)
-        else:
+        elif method == "mice":
             mice_columns.append(column)
+        else:
+            none_columns.append(column)
 
     mice_params: dict = {}
     if mice_columns:
@@ -150,6 +171,8 @@ def resolve_imputation_plan(
         most_frequent_columns=tuple(most_frequent_columns),
         mice_columns=tuple(mice_columns),
         mice_params=mice_params,
+        none_columns=tuple(none_columns),
+        mode=mode,
     )
 
 

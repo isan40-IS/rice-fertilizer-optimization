@@ -45,7 +45,7 @@ When a decision changes, preserve the prior entry and link the replacement. Do n
 **Replacement:** DEC-006.
 
 ## DEC-006 — Native Missing-Value Models
-**Status:** Active experimental.
+**Status:** Active experimental intention, implemented by DEC-015; historical bundles retain the audited MICE behavior.
 **Decision:** Evaluate XGBoost and CatBoost with native missing-value handling instead of MICE for the latest experiment.
 **Rationale:** Avoid forced imputation of highly incomplete state variables; reported performance improved in the new experimental configuration.
 **Caution:** Several changes occurred simultaneously, so improvement cannot be attributed to native missing handling alone.
@@ -105,6 +105,30 @@ When a decision changes, preserve the prior entry and link the replacement. Do n
 The researcher authorized documentation updates following the read-only audit. No research scope, evaluation design, dataset, coefficients, selected model or methodology was changed. DEC-005/006 now distinguish the intended transition from actual MICE behavior. DEC-007/008 correct identifiers and implementation terminology, preserving historical reports. Existing selection artifacts name `xgboost_native`, but all-zero scores do not establish a weighted-metric winner (FIND-008).
 
 Corrective work in `07_research_backlog.md` is proposed, not executed or automatically approved by this update. DEC-009 and the open decisions in DEC-012/013 remain in force.
+
+
+## DEC-015 - Config-Controlled No-Imputation Baseline
+**Date:** 2026-11-17, after the repository audit.
+**Status:** Confirmed by explicit researcher instruction; implementation verified, scientific training results pending.
+**Decision:** Centralize imputation selection in `configs/decisions.yaml`, activate `state_imputation.mode: none` with the existing minimalist profile/cohort, preserve optional MICE/advanced-feature settings in an example, and defer broad-feature importance experiments.
+**Implementation:** Resolver/pipeline/trainer now honor no-imputation; notebook uses the shared trainer. Active models are XGBoost/CatBoost; other definitions are retained disabled. Modes/settings are recorded in new bundles/metric summaries. Example: `configs/examples/decision.example.yaml`.
+**Relationship to history:** Implements DEC-006's intention and replaces the active MICE settings described in DEC-005. DEC-006 remains historical experimental intent, now implemented by DEC-015; old native-labeled artifacts still use MICE. No historical result is relabeled or overwritten.
+**Verification:** 39 synthetic-data tests passed; diagnostic transform of the active dataset preserved all 1,192 numeric missing entries. No research-model training, score comparison, DE or broad-feature importance experiment was run.
+**Risks/open items:** Native handling does not resolve selection/missingness bias. Final surrogate choice and optimization decisions in DEC-012/013 remain open. Broader feature examples require a dataset with the corresponding columns and a reviewed lineage.
+
+## DEC-016 - Broad Candidate Profile for Feature-Importance Planning
+**Date:** 2026-11-17, after DEC-015.
+**Status:** Researcher-requested exploratory preparation completed; profile is not active and experiment is deferred.
+**Request:** Use XGBoost/CatBoost only; derive a broad numeric/categorical profile from `data/metadata/metadata.xlsx`, including implemented engineered features, without missingness-based feature exclusions. Audit importance and plan experiment B after researcher-run modeling.
+**Result:** Added `feature_importance_candidates` (50 numeric / 47 categorical, 97 unique inputs) to `configs/features.yaml`. Source and schema/exclusion rationale are documented in `docs/EXPERIMENT_B_PLAN.md`. Outcomes, explicit post-treatment pH/EC, identifiers and unreviewed mixed-unit layer-1 P/K measures are excluded for semantics/validity, not missingness. All-missing candidate columns are retained.
+**Limits:** Active profile/dataset/model settings unchanged. No broader cohort, row deletion, unit conversion, new validation strategy or final feature selection is approved. Timing of generic soil measures and measurement comparability remain execution checks. Current CSV lacks 86 inputs; enrichment/parsing is pending.
+**Next:** Review data readiness and experiment-B implementation only when requested; no model or importance experiment was executed in this task.
+
+## DEC-017 - Runnable Experiment-B Configuration on the Existing Cohort
+**Date/status:** 2026-11-17; explicitly authorized by the researcher asking to complete all experiment configs.
+**Decision/implementation:** Activate the broad profile with native numerical missing handling and XGBoost/CatBoost, use raw data to enrich the same 1,000 reference IDs into a separate dataset, and isolate run artifacts under `artifacts/experiment_B`. Parse all selected numeric source features; preserve original labels/doses/state values, row order and grouped split. Pin source/reference hashes and fail on mismatches rather than silently selecting/replacing data.
+**Supersedes:** DEC-016's inactive-profile/data-preparation status only; its exploratory scope and feature rationale remain. No additional rows are removed or added, no unit conversion is assumed, and no importance-based selection is finalized. Existing model eligibility threshold and optimization coefficients are unchanged.
+**Verification:** 47 tests passed; temporary preprocessing of real data preserved 1,000 reference rows and the same 808/192 split. No final dataset export or research-model training was performed. User execution commands are in `docs/EXPERIMENT_B_PLAN.md`.
 
 ## Decision Addition Format
 `DEC-XXX — Title | Date | Status | Decision | Evidence | Rationale | Alternatives | Risks | Affected artifacts | Reviewer/approval | Supersedes`.

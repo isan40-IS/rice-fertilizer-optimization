@@ -94,5 +94,33 @@ Do not upgrade a finding's evidence status without checking the cited artifact.
 **Evidence:** `tests/integration/test_model_pipeline.py` calls an older pipeline interface; `tests/e2e/test_smoke_configuration.py` expects null profile/bounds despite current settings. `docs/VALIDATION_STATUS.md` records historical checks.
 **Limit:** Pytest was not executed; no current pass/fail count is asserted. Repair/revalidation is proposed work.
 
+
+## FIND-011 - Corrected Config-Driven No-Imputation Path
+**Date/status:** 2026-11-17, verified implementation and regression checks after explicit researcher authorization.
+**Evidence:** Resolver separates `none` from MICE; global mode is forwarded by trainer and inferred from plans when needed. Notebook training uses the shared trainer, retaining selection settings. 39 tests passed, including synthetic XGBoost/CatBoost fit/predict/reload, mode-driven trainer exports, mixed optional imputation and target/dose protection.
+**Data diagnostic:** Fitting only the new preprocessor for inspection on the active 1,000-row dataset preserved all 1,192 numeric NaNs. No predictive model was fitted on research data; the diagnostic preprocessor was not saved or used for score evaluation.
+**Interpretation:** No-imputation is now implemented/verified. This is not evidence of improved yield prediction or a newly selected scientific surrogate. FIND-007/008 remain valid descriptions of historical code/artifacts; their source-level causes have been corrected.
+**Limits/next step:** Obtain a new controlled training run when requested. Broader feature importance, final surrogate selection and DE remain pending.
+
+## FIND-012 - Metadata and Feature-Importance Audit for Experiment B
+**Date/status:** 2026-11-17, verified metadata/schema/code observations; no importance results.
+**Evidence:** Read `data/metadata/metadata.xlsx` sheet Metadata and actual 125-column raw CSV. Metadata explicitly identifies final pH/EC as after treatment. Actual density headers are `bd.1/.2/.3`; layer-1 soil P/K have multiple reported units. New optional profile contains 50 numeric/47 categorical inputs, including seven engineered features. Existing 20-column minimalist CSV lacks 86 of these inputs. Many broader numeric source values use decimal commas, while preprocessing currently coerces only the 11 configured numeric fields.
+**Importance evidence:** `interpretation.py` correctly uses fitted transformed feature names for built-in scores and scores the fitted pipeline for raw-column permutations. XGBoost default tree importance is normalized gain; CatBoost non-ranking regression uses PredictionValuesChange. Built-in values are not directly comparable across models. The helper silently truncates name/value mismatches with `min`; trainer forwards `None` if scoring is absent, overriding the helper default. Active scoring is explicit negative RMSE.
+**Interpretation risks:** Independent dose/derived permutations create inconsistent NPK representations; correlations can mask individual reliance. Current permutations use holdout, not fold validation. Selecting features with them makes the same holdout adaptive evaluation. Missingness, method/depth and spatial context may act as proxies. Proposed CV/family-level methods are not yet implemented or approved as a changed evaluation design.
+**Next:** Follow `docs/EXPERIMENT_B_PLAN.md` after researcher-run modeling; establish same-cohort enrichment, numeric parsing, unit/timing checks, then implement agreed importance diagnostics. Importance is not causal agronomic evidence.
+
+## FIND-013 - Reference-Cohort Preprocessing Verified for Broad Inputs
+**Date/status:** 2026-11-17, verified implementation and temporary real-data preflight.
+**Evidence:** Configured preprocessing yields 1,000 rows, 106 dataset columns, 97 input columns and 196 encoded columns. It reproduces all reference values/IDs/order and the original 808/192 holdout IDs; the baseline file hash is unchanged. No-imputation preprocessing preserves 32,901 numeric missing entries. Parsing records 20 nonnumeric precipitation strings becoming missing, matching existing reference missingness. All 47 tests passed, including altered-label, missing-ID, duplicate-ID, changed-hash, row-loss and overwrite failure checks.
+**Interpretation:** Configuration/data readiness is demonstrated for the preserved cohort, not improved predictive performance, causal validity, final agronomic comparability or a newly trained surrogate. Generic soil measurement timing and previously documented importance limitations still apply.
+**Limit:** No final dataset was exported; preflight used a temporary directory. No research-model training, importance experiment or DE run occurred.
+
+## FIND-014 - Trained Experiment-B Run and Diagnostic Coverage
+**Date/status:** 2026-11-17; verified from user-created notebook, saved CSVs/bundles and separately executed diagnostic code. No model refit by the agent.
+**Source:** `artifacts/experiment_B/ta_20261116T203731Z`; diagnostic details/interpretation in `notebooks/2_model_experiment/experiment_B.ipynb`.
+**Results:** XGBoost CV mean R2 0.626900 and RMSE 1853.726; CatBoost 0.609425 and 1899.908. Holdout RMSE 1440.205/1440.017 (R2 0.736758/0.736826); training-mean baseline RMSE 2812.128. Seven articles overlap across partitions despite zero article-experiment group overlap. 39/97 inputs are entirely missing; 3 have a single observed value. All 192 complete reported-coordinate holdout pairs also occur in training. Both pipelines preserve all 6,452 numeric NaNs on holdout without an imputer.
+**Interpretation:** Predictive utility on this cohort/holdout is supported; causal dose response and new-location generalization are not established. Holdout RMSE difference (~0.188 kg/ha) is descriptive, not demonstrated superiority. Repeated raw inputs (67 distinct among 192) partly explain repeated predictions. No features or rows were discarded.
+**Pending:** Optional joint-family permutation, fold-based discovery, spatial ablation and surrogate response diagnostics; no such results are claimed.
+
 ## Finding Template
 `FIND-XXX | Date | Evidence status | Observation | Source/artifact | Interpretation | Alternative explanations | Limitations | Next verification`.

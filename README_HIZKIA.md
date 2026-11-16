@@ -348,3 +348,58 @@ Semua keputusan tersebut perlu dijelaskan di Bab 3 dan dianalisis di Bab 4.
 10. Validasi bersama pakar agronomi.
 
 Optimizer dapat menemukan kelemahan model. Karena itu objective tinggi tidak boleh dibaca sendirian tanpa domain check, stabilitas, dan interpretasi.
+## Pengaturan fitur dan imputasi aktif
+
+Training melalui `scripts/train_models.py` dan bagian training
+`notebooks/2_model_experiment/experiment_A.ipynb` memakai trainer yang sama.
+Pengendali imputasinya adalah `configs/decisions.yaml`:
+
+```yaml
+feature_profile: minimalist_features
+state_imputation:
+  mode: none
+  default_method: none
+  columns: {}
+```
+
+`mode: none` menonaktifkan seluruh imputer, termasuk jika konfigurasi lama
+masih memiliki metode per kolom. NaN numerik diteruskan ke estimator;
+kategorikal di-one-hot tanpa imputasi (NaN menjadi kategori tersendiri).
+Model aktif di `configs/models.yaml` adalah XGBoost dan CatBoost.
+
+Untuk imputasi, gunakan `mode: plan`, lalu tentukan `default_method`,
+`columns` dan, jika diperlukan, `mice_shared`. Contoh lengkap MICE dengan
+profil `advanced_imputation` ada di `configs/examples/decision.example.yaml`.
+Contoh tidak dimuat otomatis: salin bagian yang diperlukan ke konfigurasi
+aktif secara eksplisit, dan pastikan dataset memiliki semua kolom profil.
+Dalam mode plan, default kategorikal adalah `most_frequent`; metode `none`
+per kolom mempertahankan missing tanpa imputer.
+
+Pipeline, mode dan konfigurasi imputasi disimpan dalam bundle baru agar
+inferensi/optimasi mengikuti preprocessing saat training. Bundle dan metrik
+historis tidak berubah; label `native` pada eksperimen lama bukan bukti
+bahwa bundle tersebut dilatih tanpa imputasi. Diperlukan training baru
+untuk memperoleh model riset yang memakai alur ini.
+
+## Konfigurasi aktif experiment B
+
+Konfigurasi saat ini memakai `feature_importance_candidates` (97 input), dua
+model XGBoost/CatBoost, dan tanpa imputasi. `configs/paths.yaml` membaca raw CSV
+serta baseline 1.000 baris sebagai referensi cohort; output baru adalah
+`data/processed/experiment_B_candidates.csv`. Artefak run tersimpan di
+`artifacts/experiment_B/<run_id>/`.
+
+Dari root proyek, dengan environment Python proyek aktif:
+
+```powershell
+python scripts/preprocess.py
+python scripts/train_models.py
+```
+
+Atau `python scripts/run_full_experiment.py` untuk preprocessing dan training
+dalam satu run. Preprocessing mempertahankan ID, urutan, target, dosis dan kolom
+baseline yang sama; hash/ID/nilai yang tidak cocok menyebabkan proses berhenti.
+Parsing seluruh numerik profil tidak mengimputasi missing. Baseline lama tidak
+ditulis ulang. Rincian konfigurasi dan keterbatasan importance ada di
+`docs/EXPERIMENT_B_PLAN.md`. Dokumen pengaturan minimalist sebelumnya adalah
+contoh baseline terdahulu; profil aktif kini ditentukan oleh decisions.yaml.

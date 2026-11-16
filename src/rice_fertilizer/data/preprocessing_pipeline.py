@@ -15,6 +15,8 @@ from .crop_filter import filter_crop
 from .missing_values import reconstruct_structural_zeroes
 from .cleaner import filter_valid_target_rows, standardize_string_columns, filter_valid_decision_rows
 from .feature_engineering import add_npk_features, select_feature_frame
+from .cohort import align_reference_cohort, validate_reference_preserved
+from ..exceptions import DataValidationError
 
 LOGGER = logging.getLogger(__name__)
 
@@ -31,6 +33,8 @@ def run_preprocessing(configs: dict[str, Any], run_dir: Path) -> dict[str, Path]
     data_cfg, paths_cfg = configs["data"], configs["paths"]
     input_path = resolve_path(paths_cfg["input_csv"])
     processed_path = resolve_path(paths_cfg["processed_dataset"])
+    if processed_path.resolve() == input_path.resolve():
+        raise ConfigurationError("Processed output must not overwrite raw input")
     audit_dir = run_dir / "data_audit"
     audit_dir.mkdir(parents=True, exist_ok=True)
 
@@ -41,6 +45,33 @@ def run_preprocessing(configs: dict[str, Any], run_dir: Path) -> dict[str, Path]
         )
     )
     target = configs["decisions"].get("target_column") or data_cfg["target_column"]
+    reference = None
+    cohort_metadata = {"mode": "all_eligible"}
+    cohort_cfg = data_cfg.get("cohort", {})
+    cohort_mode = cohort_cfg.get("mode", "all_eligible")
+    if cohort_mode not in {"all_eligible", "reference"}:
+        raise ConfigurationError("data.cohort.mode must be all_eligible or reference")
+    if cohort_mode == "reference":
+        reference_path = resolve_path(require_value(paths_cfg, "cohort_reference"))
+        if reference_path.resolve() in {
+            processed_path.resolve(), processed_path.with_suffix(".parquet").resolve(),
+        }:
+            raise ConfigurationError("Processed output must not overwrite the reference cohort")
+        for path, key in [
+            (input_path, "input_sha256"), (reference_path, "reference_sha256"),
+        ]:
+            if hash_file(path) != require_value(cohort_cfg, key):
+                raise DataValidationError(f"Cohort provenance hash mismatch: {path}")
+        reference = pd.read_csv(reference_path)
+        df = align_reference_cohort(
+            df, reference, data_cfg["identifier_columns"]["record_id"],
+            int(require_value(cohort_cfg, "expected_rows")),
+        )
+        cohort_metadata = {
+            "mode": "reference", "reference_path": str(reference_path),
+            "reference_sha256": hash_file(reference_path),
+            "expected_rows": len(reference),
+        }
     decision_features = configs["features"]["decision_features"]
     profile_name, profile = _selected_profile(configs)
     engineered_features = set(configs["features"].get("engineered_features", []))
@@ -55,9 +86,18 @@ def run_preprocessing(configs: dict[str, Any], run_dir: Path) -> dict[str, Path]
     ]))
     validate_required_columns(df, required)
     
-    df, coercion = coerce_numeric_columns(df, data_cfg.get("numeric_columns", []))
+    numeric_columns = list(dict.fromkeys([
+        *data_cfg.get("numeric_columns", []), *source_numeric_features,
+        *data_cfg["nutrient_rates"].values(), target,
+    ]))
+    df, coercion = coerce_numeric_columns(df, numeric_columns)
+    for column, limits in data_cfg.get("numeric_ranges", {}).items():
+        if column in df:
+            observed = df[column].dropna()
+            if not observed.between(limits["min"], limits["max"]).all():
+                raise DataValidationError(f"Values outside configured range: {column}")
     raw_profile = profile_columns(df)
-    raw_anomalies = find_numeric_anomalies(df, data_cfg.get("numeric_columns", []))
+    raw_anomalies = find_numeric_anomalies(df, numeric_columns)
     duplicates = duplicate_report(df)
 
     df = filter_crop(df, **data_cfg["crop"])
@@ -116,8 +156,12 @@ def run_preprocessing(configs: dict[str, Any], run_dir: Path) -> dict[str, Path]
         ] if column in df.columns
     ]
     model_df = select_feature_frame(
-        df, profile["numeric"], profile["categorical"], target, passthrough, decision_features
+        df, profile["numeric"], profile["categorical"], target,
+        decision_features=decision_features, passthrough_columns=passthrough,
     )
+    if reference is not None:
+        validate_reference_preserved(model_df, reference)
+        cohort_metadata["reference_values_preserved"] = True
     processed_path.parent.mkdir(parents=True, exist_ok=True)
     model_df.to_csv(processed_path, index=False)
     if data_cfg["runtime_output"].get("save_parquet", True):
@@ -140,6 +184,9 @@ def run_preprocessing(configs: dict[str, Any], run_dir: Path) -> dict[str, Path]
     save_json({
         "input_path": str(input_path),
         "input_sha256": hash_file(input_path),
+        "processed_path": str(processed_path),
+        "processed_sha256": hash_file(processed_path),
+        "cohort": cohort_metadata,
         "feature_profile": profile_name,
         "target": target,
         "rows_processed": int(len(model_df)),

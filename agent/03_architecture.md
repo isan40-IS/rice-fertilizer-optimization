@@ -1,5 +1,20 @@
 # 03 — Architecture and Code Navigation
 
+## Experiment-B Configuration Readiness (2026-11-17, Latest)
+Active settings now use the broad `feature_importance_candidates` profile, separate processed output `data/processed/experiment_B_candidates.csv` and artifacts root `artifacts/experiment_B`. The cohort reference is the existing 1,000-row minimalist CSV. `data/cohort.py` aligns the same IDs/order; input/reference hashes, exact count and preserved reference values are checked before writing. Preprocessing unions declared profile numerics with configured numeric columns, parses decimal commas, validates coordinate ranges, reconstructs existing structural zeroes, regenerates NPK features and refuses reference/raw overwrite. Original preprocessing without cohort mode remains available as `all_eligible`; no cohort change was made here. Output audit records processed/cohort hashes. Details/commands: `docs/EXPERIMENT_B_PLAN.md`. Earlier implementation/audit sections below are historical snapshots.
+
+
+## Implementation Update (2026-11-17, After Audit)
+- `resolve_imputation_plan` reads global `state_imputation.mode`; `none` suppresses all imputers, while `plan` applies configured methods. Per-column `none` is now distinct from MICE. Categorical methods are respected instead of always applying mode imputation.
+- `build_preprocessor` can infer mode from the resolved plan; `trainer.py` explicitly forwards it. Broader profiles listing N/P/K numerically do not cause duplicate dose inputs.
+- Training stores `imputation_mode` in metric summaries and bundles plus the effective `state_imputation` configuration in bundles. The fitted pipeline continues to govern inference.
+- Active config keeps `minimalist_features`, the same 1,000-row dataset and grouped validation. XGBoost/CatBoost are enabled; the other model definitions are retained but disabled. MICE settings are in the opt-in `configs/examples/decision.example.yaml`.
+- Experiment A's training cells now call shared `run_training`, use config settings without local overrides, retain selection weights and create a fresh run ID. Changed training-cell outputs/execution counts were cleared; later analysis is explicitly historical. No notebook training was run.
+- Corrected focused pipeline/config tests and added regression checks for native NaNs, MICE/simple/none combinations, categorical missingness, no target/dose imputation, serialization and trainer mode wiring. Entire suite: **39 passed**. Tests use synthetic data; historical scientific bundles remain unchanged.
+
+The audit section below is retained as pre-fix evidence; implementation problems described there are corrected in source, while the inspected old artifacts still have their audited behavior.
+
+
 ## Important Version Warning
 The historical sections below describe the earlier uploaded partial snapshot and are retained for traceability. A direct repository/artifact audit on **2026-11-17** verified the current components listed next. Read the current audit before relying on a historical path or setting.
 

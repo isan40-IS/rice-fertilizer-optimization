@@ -1,3 +1,5 @@
+# Active: XGBoost/CatBoost for numerical native NaN handling.
+# Other model definitions are retained but disabled for this baseline.
 scoring: "neg_root_mean_squared_error"
 search_iterations: 30
 n_jobs: -1
@@ -7,13 +9,13 @@ permutation_importance_n_jobs: 1
 
 models:
   linear_regression:
-    enabled: true
+    enabled: false
     class: linear_regression
     params: {}
     search_space: {}
 
   random_forest:
-    enabled: true
+    enabled: false
     class: random_forest
     params:
       n_estimators: 300
@@ -58,7 +60,7 @@ models:
       model__random_strength: [0.0, 0.5, 1.0, 2.0]
 
   "lightgbm": {
-        "enabled": True,
+        "enabled": false,
         "class": "lightgbm",
         "params": {
             "random_state": 42,
@@ -75,7 +77,7 @@ models:
         }
     }
   extra_trees:
-    enabled: true
+    enabled: false
     class: extra_trees
     params:
       n_estimators: 300
@@ -96,4 +98,4 @@ selection:
     rmse_std: 0.15
     mae_std: 0.10
     r2_mean: -0.10
-  minimum_r2: null
+  minimum_r2: 0.60

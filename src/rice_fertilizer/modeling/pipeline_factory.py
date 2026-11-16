@@ -17,7 +17,7 @@ def build_preprocessor(
     decision_features: list[str],
     scale_numeric: bool,
     imputation_plan: ResolvedImputationPlan | None = None,
-    imputation_mode: ImputationMode = "plan",
+    imputation_mode: ImputationMode | None = None,
 ) -> ColumnTransformer:
     """
     Build preprocessing pipeline.
@@ -43,6 +43,8 @@ def build_preprocessor(
     # 0. Validasi mode
     # =========================================================
 
+    if imputation_mode is None:
+        imputation_mode = imputation_plan.mode if imputation_plan else "plan"
     if imputation_mode not in ("plan", "none"):
         raise ValueError(
             f"imputation_mode harus 'plan' atau 'none', bukan {imputation_mode!r}."
@@ -55,7 +57,11 @@ def build_preprocessor(
             "imputation_mode='plan' membutuhkan imputation_plan."
         )
 
-    if not use_imputation and imputation_plan is not None:
+    if not use_imputation and imputation_plan is not None and any((
+        imputation_plan.median_columns,
+        imputation_plan.most_frequent_columns,
+        imputation_plan.mice_columns,
+    )):
         warnings.warn(
             "imputation_plan diberikan tetapi imputation_mode='none'; "
             "plan diabaikan.",
@@ -64,9 +70,10 @@ def build_preprocessor(
 
     transformers = []
 
+    # Some broader profiles also list N/P/K as numeric: transform them once.
+    numeric_features = [c for c in numeric_features if c not in decision_features]
+
     numeric_set = set(numeric_features)
-    categorical_set = set(categorical_features)
-    decision_set = set(decision_features)
 
     # =========================================================
     # 1. Pisahkan imputation plan berdasarkan tipe fitur
@@ -217,10 +224,22 @@ def build_preprocessor(
     #    NaN sebagai kategori tersendiri.
     # =========================================================
 
-    if categorical_features:
+    categorical_imputed = [
+        col for col in categorical_features
+        if use_imputation and col in imputation_plan.most_frequent_columns
+    ]
+    categorical_complete = [
+        col for col in categorical_features if col not in categorical_imputed
+    ]
+    for name, columns, impute in [
+        ("categorical", categorical_imputed, True),
+        ("categorical_complete", categorical_complete, False),
+    ]:
+        if not columns:
+            continue
         categorical_steps = []
 
-        if use_imputation:
+        if impute:
             categorical_steps.append((
                 "imputer",
                 build_simple_imputer("most_frequent"),
@@ -235,9 +254,9 @@ def build_preprocessor(
         ))
 
         transformers.append((
-            "categorical",
+            name,
             Pipeline(categorical_steps),
-            categorical_features,
+            columns,
         ))
 
     # =========================================================
@@ -257,8 +276,8 @@ def build_model_pipeline(
     categorical_features: list[str],
     decision_features: list[str],
     model_class: str,
-    imputation_plan: ResolvedImputationPlan,
-    imputation_mode: ImputationMode = "plan",
+    imputation_plan: ResolvedImputationPlan | None = None,
+    imputation_mode: ImputationMode | None = None,
 ) -> Pipeline:
 
     preprocessor = build_preprocessor(

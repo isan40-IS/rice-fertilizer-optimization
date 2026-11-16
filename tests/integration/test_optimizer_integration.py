@@ -19,7 +19,10 @@ def test_optimizer_connects_to_surrogate(synthetic_data):
     estimator = create_estimator(
         "random_forest", {"n_estimators": 30, "random_state": 1}
     )
-    pipeline = build_model_pipeline(estimator, numeric, categorical, "random_forest")
+    pipeline = build_model_pipeline(
+        estimator, numeric, categorical, decision_features=[],
+        model_class="random_forest", imputation_mode="none",
+    )
     pipeline.fit(df[features], df["yield.wb.kg_ha"])
     predictor = SurrogatePredictor({
         "pipeline": pipeline,

@@ -1,6 +1,7 @@
 from __future__ import annotations
 from pathlib import Path
 from typing import Any
+from copy import deepcopy
 import logging
 import pandas as pd
 from ..config import require_value, resolve_path
@@ -33,7 +34,9 @@ def run_training(configs: dict[str, Any], run_dir: Path) -> dict[str, Path]:
     profile = configs["features"]["profiles"][profile_name]
     numeric_features = profile["numeric"]
     categorical_features = profile["categorical"]
-    feature_columns = numeric_features + categorical_features + decision_features
+    feature_columns = list(dict.fromkeys(
+        numeric_features + categorical_features + decision_features
+    ))
     missing = [column for column in feature_columns + [target] if column not in df.columns]
     if missing:
         raise ConfigurationError(f"Processed data is missing selected columns: {missing}")
@@ -95,6 +98,7 @@ def run_training(configs: dict[str, Any], run_dir: Path) -> dict[str, Path]:
             decision_features=decision_features,
             model_class=spec["class"],
             imputation_plan=imputation_plan,
+            imputation_mode=imputation_plan.mode,
         )
         tuned, search_info = tune_pipeline(
             pipeline,
@@ -136,6 +140,7 @@ def run_training(configs: dict[str, Any], run_dir: Path) -> dict[str, Path]:
 
         summary = {
             "model": model_name,
+            "imputation_mode": imputation_plan.mode,
             **cv_summary,
             **{f"holdout_{key}": value for key, value in holdout_metrics.items()},
             "best_search_score": search_info["best_score"],
@@ -145,6 +150,8 @@ def run_training(configs: dict[str, Any], run_dir: Path) -> dict[str, Path]:
             "pipeline": tuned,
             "model_name": model_name,
             "feature_profile": profile_name,
+            "imputation_mode": imputation_plan.mode,
+            "state_imputation": deepcopy(configs["decisions"]["state_imputation"]),
             "numeric_features": numeric_features,
             "categorical_features": categorical_features,
             "feature_columns": feature_columns,

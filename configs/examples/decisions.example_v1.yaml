@@ -6,6 +6,11 @@ validation_strategy: group_kfold
 group_column: group_article_experiment
 target_column: yield.wb.kg_ha
 baseline_policy: observed
+# Contoh MICE/fitur lanjutan: lihat decision.example.yaml di folder ini.
+state_imputation:
+  mode: plan
+  default_method: median
+  columns: {}
 optimization:
   bounds:
     N:

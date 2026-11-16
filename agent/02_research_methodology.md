@@ -1,5 +1,9 @@
 # 02 — Research Methodology and Scientific Guardrails
 
+## Implementation Update: Config-Controlled Missing Handling (2026-11-17)
+The researcher explicitly authorized implementation of no-imputation training, retaining the current feature cohort; the broad-feature importance experiment is deferred. Current `state_imputation.mode` in `configs/decisions.yaml` is `none`, with `default_method: none` and empty overrides. `plan` remains available as an opt-in per-feature imputation mode. Numerical NaNs reach the estimator; categoricals remain one-hot encoded without imputation. The advanced MICE example is `configs/examples/decision.example.yaml` and is not loaded automatically. Validation design, dataset, target and optimization coefficients are unchanged. Historical audit statements below concern the pre-fix code or old artifacts, not a new native-model result.
+
+
 ## End-to-End Logic
 1. Define objectives and agronomic questions.
 2. Inspect/filter the Senegal dataset for rice and valid yield observations.

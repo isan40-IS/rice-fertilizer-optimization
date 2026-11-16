@@ -1,11 +1,20 @@
 # 07 — Research Backlog and Experiments
 
+## Experiment-B analysis progress (2026-11-17)
+User-run training artifacts now exist for `ta_20261116T203731Z`. Notebook diagnostics/interpretation were added and verified read-only (FIND-014); this supersedes earlier pending-training status for this run. Coverage, provenance, aggregation and error/spatial diagnostics are available. Optional joint permutations remain disabled/unexecuted; training-fold importance, spatial ablation and final feature selection remain pending proposals. No new row removal or methodology change is authorized by this progress note.
+
+
 ## Prioritization Rules
 - **P0:** necessary to honor current supervisor direction or prevent scientifically invalid optimization.
 - **P1:** important to evaluate and interpret optimization once a baseline is running.
 - **P2:** useful model enhancement or exploratory diagnostics that should not block immediate optimization by default.
 
 Backlog items are proposals, not approval to modify the current dataset/methodology. Prefer smaller tests that isolate a single hypothesis.
+
+## Implementation Progress After Audit (2026-11-17)
+Researcher authorized no-imputation implementation (DEC-015). TASK-002 source correction and targeted verification are complete; future research-data training remains pending. TASK-014 notebook/config wiring correction is complete; historical selections are preserved and a new scientific model selection is pending. TASK-015 existing-test repair/regression checks are complete: **39 tests passed**. No broad-feature importance experiment was run. Keep TASK-001 provenance/freeze, TASK-003 response readiness, open objective decisions and TASK-004 DE work pending.
+
+Progress/proposal text below records audit-time status. Implementation is now authorized and completed only to the extent stated here; historical result comparison, new training, broader features and final methodology choices are not automatically complete.
 
 ## P0 — Baseline Verification and Initial Optimization
 
@@ -93,7 +102,18 @@ Backlog items are proposals, not approval to modify the current dataset/methodol
 **Method:** Update focused tests when implementation work is authorized; verify meaningful native-input preservation/selection regression checks and report actual execution results.
 **Limit:** No tests were modified or executed by the documentation update.
 
+### TASK-016 - Experiment B: Broad Feature-Importance Study (Explicitly Deferred)
+**Request/status:** Researcher requested preparation, not execution. Metadata-based profile and audit/plan completed on 2026-11-17; see DEC-016/FIND-012 and `docs/EXPERIMENT_B_PLAN.md`. This concretizes TASK-011 without changing the active baseline.
+**Pending readiness:** Enrich the same approved record IDs into a separate dataset, parse all selected numeric fields, review units/measurement timing and validate schema. No row selection or dataset replacement is authorized by this entry.
+**Proposed implementation:** Assert feature-name/value alignment, export method/scoring/provenance and mappings, retain raw permutation repetitions, plan training-group-CV importance and coherent NPK-family permutations. Compare both models with coverage/cardinality/fold stability; do not automatically select/remove features from holdout ranks.
+**Restriction:** Do not execute experiment B, train a broad model, or activate the new profile until requested. No importance result or reduced feature set exists yet.
+
+### TASK-017 - Experiment-B Runnable Configuration and Cohort Preparation
+**Status:** Completed implementation/configuration and temporary verification, 2026-11-17 (DEC-017/FIND-013).
+**Done:** Separate output/artifact paths; exact reference cohort with provenance/value checks; all numeric source parsing; coordinate checks; 47 passing tests and real-data preflight preserving 1,000 IDs and the holdout. This completes TASK-016's technical enrichment/parsing readiness, not its feature-importance analysis.
+**Pending:** User-run final preprocessing/training, review metric eligibility and data/importance diagnostics, then explicitly requested experiment-B analyses. Preserve unit/timing cautions, holdout-use restrictions and DE decision gates. No scientific result is marked complete merely because configs are runnable.
+
 ## Next-Task Selection
-**Recommended after audit (not executed):** finish TASK-001 provenance -> TASK-002 and TASK-014 correction -> necessary matched-cohort comparison and explicit surrogate selection -> TASK-003 with minimal TASK-005 response checks -> resolve open coefficients/bounds/baseline -> TASK-004. Keep corrective work bounded to support the optimization milestone. Broad feature search/Optuna remain P2. Researcher approval is required for scientific configuration changes.
+**Historical recommendation after audit (implementation progress above supersedes completed items):** finish TASK-001 provenance -> TASK-002 and TASK-014 correction -> necessary matched-cohort comparison and explicit surrogate selection -> TASK-003 with minimal TASK-005 response checks -> resolve open coefficients/bounds/baseline -> TASK-004. Keep corrective work bounded to support the optimization milestone. Broad feature search/Optuna remain P2. Researcher approval is required for scientific configuration changes.
 
 After each experiment, record: hypothesis, dataset and split, exact modification, verification artifact, outcome, uncertainty, decision, and whether it changes the active baseline.

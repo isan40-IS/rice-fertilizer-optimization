@@ -1,6 +1,42 @@
 # 05 - Current Working State
 
+## Experiment-B Notebook Diagnostics (2026-11-17, Latest)
+Researcher created/trained run `artifacts/experiment_B/ta_20261116T203731Z` and requested additions to `notebooks/2_model_experiment/experiment_B.ipynb`. Notebook now includes snapshot/hash/cohort audits, feature coverage, native-NaN/encoder mapping checks, original-feature built-in aggregation, permutation interpretation, train-validation gaps, training-mean baseline, group residuals, duplicate-input and spatial coverage checks. Added code was verified separately against saved bundles without refitting; original result outputs retained except corrected setup. Optional joint NPK/coordinate permutation is disabled by default and was not run.
+Verified: 808/192 split; 39 all-missing inputs, 3 constant observed; 7 overlapping articles (no group overlap); holdout numeric NaNs preserved (6,452); all 192 reported-coordinate pairs seen in training. Mean-training baseline holdout RMSE 2812.128; XGBoost/CatBoost holdout RMSE 1440.205/1440.017, CV mean R2 0.626900/0.609425. Holdout has 67 unique input combinations, 55/67 unique predictions. No feature selection, row deletion or DE decision was made. Notebook contains interpretation and limits, not causal claims. Earlier statements of unexecuted user training below are historical.
+
+
+## Active Configuration Ready for User Run (2026-11-17, Latest)
+- User requested complete experiment-B configurations. Active profile: `feature_importance_candidates` (97 inputs), XGBoost/CatBoost only, no imputation, same grouped validation/seed/selection settings. Minimum CV R2 remains 0.60; no threshold was relaxed.
+- Raw source: `data/input/data.csv`; read-only cohort reference: `data/processed/model_dataset_balanced_1000_minimalist_504622.csv`; new output: `data/processed/experiment_B_candidates.csv`; artifacts: `artifacts/experiment_B/<run_id>/`.
+- `data.yaml` configures exact 1,000-ID reference mode, source/reference hashes, all 44 numeric source/target fields and coordinate bounds. Preprocessing supports cohort alignment, numeric-profile parsing and preservation checks; it fails rather than silently changing rows/labels or overwriting the reference.
+- Verification: **47 tests passed**. Temporary real-data preprocessing produced 1,000 rows / 106 columns / 97 model inputs / 196 encoded columns, preserved all baseline values and 32,901 numeric missing entries, and reproduced the same 808/192 holdout IDs. Twenty precipitation strings coerce to missing already present in the reference; no new missingness relative to baseline was introduced there.
+- Final-path preprocessing and research-model training were not executed. Run `python scripts/preprocess.py` then `python scripts/train_models.py`, or `python scripts/run_full_experiment.py`, from the repository root in the project environment. The enriched final CSV is created by those preprocessing commands.
+- Unit/timing interpretation and importance caveats remain as documented. Per-fold/coherent-family importance and experiment-B analysis notebook are still deferred. No new scientific scores, selected surrogate or DE results exist.
+
+
 **Updated:** 2026-11-17, after direct repository/artifact audit and explicit researcher request for documentation updates.
+
+## Latest Task: Feature-Importance Preparation (2026-11-17, After No-Imputation Fix)
+- Researcher requested a broad metadata-based profile and importance audit/plan; experiment B is explicitly deferred until after researcher-run modeling.
+- Added optional `feature_importance_candidates`: 50 numeric + 47 categorical = 97 unique inputs, with all seven NPK-derived features. Missingness did not determine exclusion; final pH/EC, outcomes/IDs and unreviewed mixed-unit layer-1 P/K are excluded for validity. Generic soil measurement timing still needs review.
+- Only XGBoost/CatBoost are enabled. Active `minimalist_features`, no-imputation settings and dataset path were not changed by this task; existing selection settings were also left intact.
+- `docs/EXPERIMENT_B_PLAN.md` records source mappings, exclusions, readiness gates, access paths and importance limitations. Current minimalist data lacks 86 candidate inputs; same-ID enrichment, numeric parsing and unit/timing checks are pending, not executed. Do not train the broad profile using the current 20-column CSV directly.
+- Audit: built-in importance is on transformed columns, permutation importance on raw inputs through the pipeline. Silent length truncation, missing-score fallback, NPK/derived-feature consistency and holdout-based feature selection require attention before experiment B. Per-fold/family-level importance and original-feature aggregation are proposals, not implemented features.
+- Validation for this task: schema/name/count/duplicate/derived-feature checks, static inspection and installed-library/primary-documentation verification. No training, preprocessing dataset export, importance calculation, new scores or experiment-B notebook execution.
+
+## Latest Implementation State (After Audit, 2026-11-17)
+The researcher authorized points 1-5: centralized optional imputation and active no-imputation, with advanced MICE retained as an example. Implemented and checked:
+- `state_imputation.mode: none` in `configs/decisions.yaml`; `default_method: none`, empty column overrides and no active MICE block. Same minimalist profile, dataset, target, grouped split and optimization settings.
+- Resolver, preprocessor and trainer honor the switch; no-imputation applies to numeric and categorical imputer branches. Numerical NaNs are preserved; categoricals still use one-hot encoding. Mode/settings are exported in future bundles/metrics.
+- Active models: XGBoost/CatBoost. Other definitions are retained disabled.
+- Optional advanced MICE example: `configs/examples/decision.example.yaml`. Versioned examples present in the workspace are retained. Broader profiles require matching dataset columns; the example is not automatically active.
+- Experiment A now calls the shared trainer without model/imputation overrides and creates a fresh run. Changed training outputs are cleared; historical analysis remains explicitly separate.
+- **Verification: 39 tests passed.** Synthetic checks cover native fit/predict/reload and trainer mode export; diagnostic preprocessing preserved all 1,192 numeric NaNs in the active dataset. No research-data predictive model or feature-importance experiment was trained/run, and no old bundles/metrics were overwritten.
+
+The source-level native/selection wiring and stale-test blockers from the audit below are resolved. Historical metrics and bundle findings remain valid for their old runs; no corrected scientific metrics or final surrogate selection exist yet. Next: a separately requested controlled baseline training; broad-feature importance remains deferred. DE coefficients/baseline justification remain open.
+
+## Historical Audit Snapshot (Before Implementation)
+The remaining audit snapshot is retained for provenance. Its statements about code/config/test blockers describe pre-fix state; use the latest implementation state above for current behavior.
 
 ## Current Phase
 Transition from predictive modeling to Differential Evolution optimization. Reported supervisor direction remains: proceed toward optimization without further row removal. The audit found implementation/selection problems that must be separated from the intended native-missing experiment.
@@ -41,13 +77,13 @@ Earlier reported R2 around 0.72 matches the 1,000-row holdout, not CV mean. Earl
 6. **Optimizer semantics:** derived NPK reconstruction exists; runtime dose-response/support checks and fertilizer-type consistency when doses change remain pending.
 7. **Tests:** some tests use old interfaces/assumptions. Historical test-success text is not current verification. Pytest was not run.
 
-## Completed Work and Limits
+## Audit Work and Limits (Before Implementation)
 - Read AGENTS.md and all seven agent documents; inspected relevant code, configs, notebook sources/stored outputs, metrics, splits and fitted bundles.
 - Computed dataset hashes/statistics, verified split/target alignment, and inspected fitted transformers/transformed holdout input without fitting models.
 - Updated agent documents 02-07 under the explicit memory-update protocol. No research code, config, dataset or experiment artifact was changed; no training, notebook rerun, DE run or pytest execution occurred.
 - Existing `.gitignore` modification predates this work and was left untouched. `git check-ignore` confirms the updated agent documents are ignored by repository rules; ordinary `git diff` does not display these edits. Their contents were checked directly.
 
-## Recommended Next Actions (Not Executed)
+## Historical Recommended Next Actions (At Audit Time)
 1. Finish a reproducible baseline manifest and isolate run references without changing the cohort.
 2. Correct/test native-missing and selection-config wiring; retain cohort/group design for necessary comparisons and preserve historical mislabeled evidence.
 3. Explicitly select/freeze a surrogate using corrected evidence; check schema, fixed-state dose response, category semantics and domain support.
