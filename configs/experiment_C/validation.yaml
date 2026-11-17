@@ -1,0 +1,31 @@
+random_state: 42
+holdout_fraction: 0.2
+n_splits: 5
+shuffle: true
+strategies:
+  random_kfold:
+    type: random_kfold
+  group_kfold:
+    type: group_kfold
+  group_shuffle:
+    type: group_shuffle
+  temporal_holdout:
+    type: temporal_holdout
+  forward_chaining:
+    type: forward_chaining
+temporal:
+  year_column: year
+  cutoff_year: null
+  minimum_train_years: 3
+composite_groups:
+  article_experiment:
+    output_column: group_article_experiment
+    source_columns:
+    - id
+    - exp.id
+  article_experiment_year:
+    output_column: group_article_experiment_year
+    source_columns:
+    - id
+    - exp.id
+    - year

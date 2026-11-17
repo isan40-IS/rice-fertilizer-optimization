@@ -1,0 +1,57 @@
+feature_engineering:
+  ratio_pseudocount: 1e-5
+feature_profile: minimalist_features
+validation_strategy: group_kfold
+group_column: group_article_experiment
+target_column: yield.wb.kg_ha
+baseline_policy: group_mean
+state_imputation:
+  mode: none
+  default_method: none
+  columns: {}
+optimization:
+  bounds:
+    N:
+      min: 60
+      max: 180
+    P:
+      min: 6.5
+      max: 17.5
+    K:
+      min: 25
+      max: 83
+  total_soft: 200
+  total_max: 300
+  proportion_bounds:
+    N:
+      min: 0.45
+      max: 0.75
+    P:
+      min: 0.05
+      max: 0.2
+    K:
+      min: 0.15
+      max: 0.4
+  lambda_total: null
+  lambda_composition: null
+  yield_scale: null
+  enable_total_penalty: true
+  enable_composition_penalty: true
+  enable_total_hard_constraint: true
+perturbations:
+  initial.ph.soil:
+    method: absolute
+    value: null
+  avprec.mm:
+    method: iqr_fraction
+    value: null
+  soc.percentage:
+    method: iqr_fraction
+    value: null
+  som.percentage:
+    method: iqr_fraction
+    value: null
+agronomic_validation:
+  boundary_warning_fraction: null
+  max_training_distance: null
+  max_input_stability_index: null

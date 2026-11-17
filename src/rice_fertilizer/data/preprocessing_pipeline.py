@@ -33,6 +33,8 @@ def run_preprocessing(configs: dict[str, Any], run_dir: Path) -> dict[str, Path]
     data_cfg, paths_cfg = configs["data"], configs["paths"]
     input_path = resolve_path(paths_cfg["input_csv"])
     processed_path = resolve_path(paths_cfg["processed_dataset"])
+    if paths_cfg.get("processed_dataset_read_only", False):
+        raise ConfigurationError("This configuration reuses a read-only processed dataset; do not run preprocessing")
     if processed_path.resolve() == input_path.resolve():
         raise ConfigurationError("Processed output must not overwrite raw input")
     audit_dir = run_dir / "data_audit"

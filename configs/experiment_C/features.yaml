@@ -1,0 +1,299 @@
+decision_features:
+- N.rate.kg_ha
+- P.rate.kg_ha
+- K.rate.kg_ha
+engineered_features:
+- total_npk
+- ratio_n_p
+- ratio_n_k
+- ratio_p_k
+- prop_n
+- prop_p
+- prop_k
+profiles:
+  core_candidate:
+    description: High-coverage candidate from the initial EDA; still provisional.
+    numeric:
+    - N.rate.kg_ha
+    - P.rate.kg_ha
+    - K.rate.kg_ha
+    - avprec.mm
+    - total_npk
+    - ratio_n_p
+    - ratio_n_k
+    - ratio_p_k
+    categorical:
+    - soil_type
+    - fertilizer_type
+  extended_candidate:
+    description: Adds lower-coverage state variables; review imputation and support.
+    numeric:
+    - N.rate.kg_ha
+    - P.rate.kg_ha
+    - K.rate.kg_ha
+    - avprec.mm
+    - initial.ph.soil
+    - soc.percentage
+    - som.percentage
+    - avtemp.Cdegree
+    - total_npk
+    - ratio_n_p
+    - ratio_n_k
+    - ratio_p_k
+    categorical:
+    - soil_type
+    - fertilizer_type
+  source_enriched_candidate:
+    description: Adds nutrient-source categories; check proxy leakage.
+    numeric:
+    - N.rate.kg_ha
+    - P.rate.kg_ha
+    - K.rate.kg_ha
+    - avprec.mm
+    - total_npk
+    - ratio_n_p
+    - ratio_n_k
+    - ratio_p_k
+    categorical:
+    - soil_type
+    - fertilizer_type
+    - N_source
+    - P_source
+    - K_source
+  more_soil:
+    description: Nutrients and more soil features; without engineered_features
+    numeric:
+    - N.rate.kg_ha
+    - P.rate.kg_ha
+    - K.rate.kg_ha
+    - initial.ph.soil
+    - final.ph.soil
+    - initial.ec.soil.dS_m
+    - final.ec.soil.dS_m
+    - som.percentage
+    - soc.percentage
+    - clay.perc1
+    - bd.1
+    - N.nitrate.soil.layer1
+    - P.soil.layer1
+    - K.soil.layer1
+    categorical:
+    - soil_type
+    - fertilizer_type
+  more_env:
+    description: Nutrients and more env features; without engineered_features
+    numeric:
+    - N.rate.kg_ha
+    - P.rate.kg_ha
+    - K.rate.kg_ha
+    - avtemp.Cdegree
+    - avprec.mm
+    - elevation.m
+    - slope.perc
+    categorical:
+    - soil_type
+    - fertilizer_type
+  advanced_imputation:
+    description: Adds features that can be handling with advanced_imputation; rows>20%
+      total rows.
+    numeric:
+    - N.rate.kg_ha
+    - P.rate.kg_ha
+    - K.rate.kg_ha
+    - initial.ph.soil
+    - avprec.mm
+    - soc.percentage
+    - clay.perc1
+    - total_npk
+    - ratio_n_p
+    - ratio_n_k
+    - ratio_p_k
+    categorical:
+    - soil_type
+    - fertilizer_type
+    - N_source
+    - P_source
+    - K_source
+  model_based_imputation:
+    description: Adds features that can be handling with model_based_imputation; rows>10%
+      total rows.
+    numeric:
+    - N.rate.kg_ha
+    - P.rate.kg_ha
+    - K.rate.kg_ha
+    - initial.ph.soil
+    - avprec.mm
+    - avtemp.Cdegree
+    - soc.percentage
+    - clay.perc1
+    - som.percentage
+    - initial.ec.soil.dS_m
+    - bd.1
+    - total_npk
+    - ratio_n_p
+    - ratio_n_k
+    - ratio_p_k
+    categorical:
+    - soil_type
+    - fertilizer_type
+    - N_source
+    - P_source
+    - K_source
+  modeling_features:
+    description: Adds features that can be handling with advanced_imputation; without
+      decision_features.
+    numeric:
+    - initial.ph.soil
+    - avprec.mm
+    - soc.percentage
+    - clay.perc1
+    - total_npk
+    - ratio_n_p
+    - ratio_n_k
+    - ratio_p_k
+    categorical:
+    - soil_type
+    - fertilizer_type
+    - N_source
+    - P_source
+    - K_source
+  ablation_no_state:
+    description: modeling_features but no soil and feature profiles to check its impact.
+    numeric:
+    - total_npk
+    - ratio_n_p
+    - ratio_n_k
+    - ratio_p_k
+    categorical:
+    - fertilizer_type
+    - N_source
+    - P_source
+    - K_source
+  minimalist_features:
+    description: After experiment A, I examined the Missing Data Matrix and decided
+      to remove features that were burdensome, while retaining those that were necessary
+      based on logical requirements rather than feature importance.
+    numeric:
+    - initial.ph.soil
+    - avprec.mm
+    - soc.percentage
+    - total_npk
+    - ratio_n_p
+    - ratio_n_k
+    - ratio_p_k
+    categorical:
+    - fertilizer_type
+  feature_importance_candidates:
+    description: Metadata-based exploratory predictors for experiment B; retain missing
+      columns, exclude outcomes/IDs/post-treatment pH/EC. Requires enriched data and
+      numeric parsing; not optimization-ready.
+    numeric:
+    - rep_lat
+    - rep_long
+    - near_lat
+    - near_long
+    - exp_year
+    - N.rate.kg_ha
+    - P.rate.kg_ha
+    - K.rate.kg_ha
+    - S.rate.kg_ha
+    - N.fertilizer.rate.kg_ha
+    - P.fertilizer.rate.kg_ha
+    - K.fertilizer.rate.kg_ha
+    - S.fertilizer.rate.kg_ha
+    - N_fertilizer.conc
+    - P_fertilizer.conc
+    - K_fertilizer.conc
+    - S_fertilizer.conc
+    - additional_fertilizer.rate.kg_ha
+    - additional_nutrient.rate.kg_ha
+    - N.nitrate.soil.layer1
+    - N.nitrate.soil.layer2
+    - N.nitrate.soil.layer3
+    - P.soil.layer2
+    - K.soil.layer2
+    - K.soil.layer3
+    - S.soil.layer1
+    - S.soil.layer2
+    - S.soil.layer3
+    - bd.1
+    - bd.2
+    - bd.3
+    - som.percentage
+    - soc.percentage
+    - tcoef
+    - n.total.percentage
+    - clay.perc1
+    - clay.perc2
+    - initial.ph.soil
+    - initial.ec.soil.dS_m
+    - avtemp.Cdegree
+    - avprec.mm
+    - slope.perc
+    - elevation.m
+    - total_npk
+    - ratio_n_p
+    - ratio_n_k
+    - ratio_p_k
+    - prop_n
+    - prop_p
+    - prop_k
+    categorical:
+    - crop_rotation
+    - prev_crop
+    - tillage_system
+    - fertilizer_type
+    - N_source
+    - P_source
+    - K_source
+    - S_source
+    - additional_nutrient.name
+    - N.nitrate.soil.unit.layer1
+    - N.nitrate.soil.unit.layer2
+    - N.nitrate.soil.unit.layer3
+    - N.nitrate.soil.method
+    - P.soil.unit.layer2
+    - P.soil.method
+    - K.soil.unit.layer2
+    - K.soil.unit.layer3
+    - K.soil.method
+    - S.soil.unit.layer1
+    - S.soil.unit.layer2
+    - S.soil.unit.layer3
+    - S.soil.method
+    - NPKS.soil.depth.layer1
+    - NPKS.soil.depth.layer2
+    - NPKS.soil.depth.layer3
+    - NPKS.soil.depth.layer4
+    - NPKS.soil.depth.layer5
+    - soil_type
+    - texture1
+    - texture2
+    - texture3
+    - texture.depth1
+    - texture.depth2
+    - texture.depth3
+    - bd.depth1
+    - bd.depth2
+    - bd.depth3
+    - som.or.soc.depth
+    - soc.method
+    - n.total.method
+    - n.total.depth
+    - clay.depth1
+    - clay.depth2
+    - ph.soil_water.ratio
+    - ph.depth
+    - ph.method
+    - ec.depth
+candidate_state_features:
+- soil_type
+- fertilizer_type
+- avprec.mm
+- initial.ph.soil
+- soc.percentage
+- som.percentage
+- avtemp.Cdegree
+- N_source
+- P_source
+- K_source

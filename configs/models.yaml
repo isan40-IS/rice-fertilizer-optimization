@@ -7,6 +7,24 @@ random_state: 42
 permutation_importance_repeats: 10
 permutation_importance_n_jobs: 1
 
+# Search backend; old configs without this block retain RandomizedSearchCV.
+tuning:
+  method: random
+  search_seed: 42
+  cv_n_jobs: 1
+  random:
+    n_iter: 30
+  grid:
+    max_candidates: 1000
+  optuna:
+    n_trials: 30
+    timeout_seconds: null
+    sampler: tpe
+    pruner: none
+    n_jobs: 1
+    storage: null
+    resume: false
+
 models:
   linear_regression:
     enabled: false

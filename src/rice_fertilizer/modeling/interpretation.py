@@ -14,10 +14,11 @@ def built_in_feature_importance(fitted_pipeline) -> pd.DataFrame:
         values = np.abs(np.ravel(model.coef_)).astype(float)
     else:
         return pd.DataFrame(columns=["feature", "importance"])
-    length = min(len(names), len(values))
+    if len(names) != len(values):
+        raise ValueError(f"Feature importance schema mismatch: {len(names)} names / {len(values)} values")
     return pd.DataFrame({
-        "feature": names[:length],
-        "importance": values[:length],
+        "feature": names,
+        "importance": values,
     }).sort_values("importance", ascending=False).reset_index(drop=True)
 
 def permutation_feature_importance(

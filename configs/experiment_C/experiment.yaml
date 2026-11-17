@@ -1,0 +1,3 @@
+# Fresh independent searches; split and estimator seeds remain fixed.
+methods: [optuna]
+search_seeds: [11, 29, 47]

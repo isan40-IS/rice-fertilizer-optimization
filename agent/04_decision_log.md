@@ -130,5 +130,11 @@ Corrective work in `07_research_backlog.md` is proposed, not executed or automat
 **Supersedes:** DEC-016's inactive-profile/data-preparation status only; its exploratory scope and feature rationale remain. No additional rows are removed or added, no unit conversion is assumed, and no importance-based selection is finalized. Existing model eligibility threshold and optimization coefficients are unchanged.
 **Verification:** 47 tests passed; temporary preprocessing of real data preserved 1,000 reference rows and the same 808/192 split. No final dataset export or research-model training was performed. User execution commands are in `docs/EXPERIMENT_B_PLAN.md`.
 
+## DEC-018 - Configurable Tuning and Controlled Experiment C
+**Date/status:** 2026-11-17; implementation explicitly requested by researcher, implemented/tested. Research results pending.
+**Decision:** Preserve random search and add grid/Optuna selection from configuration. Isolate C configs/artifacts, hold the selected minimalist schema, cohort and folds fixed, and separate search seeds from estimator/split seeds. Remove all-missing columns only inside training-fit preprocessing. Compare all configured studies, freeze a candidate by minimum eligible mean CV RMSE, and evaluate holdout only by a separate explicit action. Existing eligibility threshold remains 0.60; no unapproved optimizer coefficient is filled.
+**Evidence:** `docs/EXPERIMENT_C_USAGE.md`, runner/notebook C and 70 passing tests; no research training execution. The earlier DEC-010 description of random-only implementation is historical; random remains available and no scientific superiority of Optuna is established.
+**Limits:** Phase one accepts finite value lists, TPE without pruning and fresh sequential studies. Persistent resume/continuous domains are not implemented. Three search seeds assess search variability, not independent dataset replication. No final surrogate or agronomic recommendation is adopted.
+
 ## Decision Addition Format
 `DEC-XXX — Title | Date | Status | Decision | Evidence | Rationale | Alternatives | Risks | Affected artifacts | Reviewer/approval | Supersedes`.

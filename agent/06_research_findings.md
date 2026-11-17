@@ -122,5 +122,11 @@ Do not upgrade a finding's evidence status without checking the cited artifact.
 **Interpretation:** Predictive utility on this cohort/holdout is supported; causal dose response and new-location generalization are not established. Holdout RMSE difference (~0.188 kg/ha) is descriptive, not demonstrated superiority. Repeated raw inputs (67 distinct among 192) partly explain repeated predictions. No features or rows were discarded.
 **Pending:** Optional joint-family permutation, fold-based discovery, spatial ablation and surrogate response diagnostics; no such results are claimed.
 
+## FIND-015 - Tuning Backend and Experiment-C Software Verification
+**Date/status:** 2026-11-17, verified implementation/testing, not scientific model results.
+**Evidence:** 70 tests pass with Optuna 5.1.0, including random/grid/Optuna refit/contracts, negative-score sign, same-seed reproducibility on deterministic synthetic data, invalid spaces/grid caps, group protection, missing optional dependency, failure exports, all-missing train-only filtering, a multi-model/multi-seed synthetic experiment and frozen holdout evaluation. Real-data readiness confirms 1,000 rows, 11 minimalist inputs and the same 808/192 split without research fitting.
+**Implementation finding:** CatBoost get_params omits valid defaults such as depth/iterations; validation now also uses its public constructor signature. This was found by a failing synthetic integration test and corrected; no field observations were altered.
+**Limits:** No C research study or improved predictive metric is claimed. Exact reproducibility across hardware/versions is not established. Whole-cohort/native-model suitability and DE decisions remain separate research questions.
+
 ## Finding Template
 `FIND-XXX | Date | Evidence status | Observation | Source/artifact | Interpretation | Alternative explanations | Limitations | Next verification`.

@@ -11,6 +11,15 @@ from .imputation import (
 import warnings
 from typing import Literal
 ImputationMode = Literal["plan", "none"]
+
+class NonEmptyColumns:
+    """ColumnTransformer evaluates this selector on each fit's training data only."""
+    def __init__(self, columns):
+        self.columns = tuple(columns)
+
+    def __call__(self, frame):
+        return [c for c in self.columns if frame[c].notna().any()]
+
 def build_preprocessor(
     numeric_features: list[str],
     categorical_features: list[str],
@@ -18,6 +27,7 @@ def build_preprocessor(
     scale_numeric: bool,
     imputation_plan: ResolvedImputationPlan | None = None,
     imputation_mode: ImputationMode | None = None,
+    drop_all_missing: bool = False,
 ) -> ColumnTransformer:
     """
     Build preprocessing pipeline.
@@ -263,6 +273,11 @@ def build_preprocessor(
     # 9. Final preprocessor
     # =========================================================
 
+    if drop_all_missing:
+        transformers = [
+            (name, transformer, columns if name == "decision_features" else NonEmptyColumns(columns))
+            for name, transformer, columns in transformers
+        ]
     return ColumnTransformer(
         transformers=transformers,
         remainder="drop",
@@ -278,6 +293,7 @@ def build_model_pipeline(
     model_class: str,
     imputation_plan: ResolvedImputationPlan | None = None,
     imputation_mode: ImputationMode | None = None,
+    drop_all_missing: bool = False,
 ) -> Pipeline:
 
     preprocessor = build_preprocessor(
@@ -287,6 +303,7 @@ def build_model_pipeline(
         scale_numeric=model_class == "linear_regression",
         imputation_plan=imputation_plan,
         imputation_mode=imputation_mode,
+        drop_all_missing=drop_all_missing,
     )
 
     return Pipeline([

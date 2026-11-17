@@ -403,3 +403,24 @@ Parsing seluruh numerik profil tidak mengimputasi missing. Baseline lama tidak
 ditulis ulang. Rincian konfigurasi dan keterbatasan importance ada di
 `docs/EXPERIMENT_B_PLAN.md`. Dokumen pengaturan minimalist sebelumnya adalah
 contoh baseline terdahulu; profil aktif kini ditentukan oleh decisions.yaml.
+
+## Experiment C: perbandingan backend tuning
+
+Implementasi mendukung random, grid, dan Optuna melalui `models.yaml.tuning`.
+Konfigurasi C terpisah pada `configs/experiment_C/`; cohort tetap 1.000 baris,
+profil yang dibekukan saat implementasi adalah `minimalist_features` (11 input).
+Data B dipakai read-only dan tidak perlu preprocessing ulang.
+
+```powershell
+python -m pip install -e ".[tuning]"
+python scripts/run_experiment_c.py
+```
+
+Default runner membandingkan random/Optuna dengan search seeds 11,29,47; model
+seed dan split seed tetap 42. Studi riset ini belum dijalankan oleh agen.
+Notebook `notebooks/2_model_experiment/experiment_C.ipynb` memiliki flag training
+nonaktif secara default; hasil dapat dibaca terpisah dari training. Holdout tidak
+dievaluasi saat pencarian. Setelah kandidat CV dibekukan, evaluasi eksplisit dengan
+`python scripts/run_experiment_c.py --evaluate-selected "<group_dir>"`.
+Panduan lengkap: `docs/EXPERIMENT_C_USAGE.md`. Resume dan ruang kontinu belum
+tersedia pada adapter awal; gunakan daftar nilai diskret bersama.

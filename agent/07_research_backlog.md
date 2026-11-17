@@ -1,5 +1,13 @@
 # 07 — Research Backlog and Experiments
 
+## Experiment-C implementation progress (2026-11-17)
+Multi-backend tuning, seed-study runner, effective snapshots, CV-only candidate freezing, explicit holdout step and notebook C are implemented under the researcher request. 70 tests passed; research studies remain unexecuted. Next: user-run bounded C studies, inspect all seed histories/runtime/eligibility, then response/domain diagnostics for DE. Persistent resume, continuous spaces, pruning, nested CV and further feature exploration remain future work; no new results or agronomic decisions follow from passing software tests.
+
+
+## Experiment-C design artifact (2026-11-17)
+`docs/EXPERIMENT_C_TUNING_PLAN.md` records the requested multi-backend development plan, Optuna usage, reproducibility/resume distinctions and proposed repeated-seed analysis. Planning deliverable complete; implementation, dependency installation, final C profile/budget, notebook creation and study execution remain pending. This does not supersede the existing random-search implementation or establish a new scientific result.
+
+
 ## Experiment-B analysis progress (2026-11-17)
 User-run training artifacts now exist for `ta_20261116T203731Z`. Notebook diagnostics/interpretation were added and verified read-only (FIND-014); this supersedes earlier pending-training status for this run. Coverage, provenance, aggregation and error/spatial diagnostics are available. Optional joint permutations remain disabled/unexecuted; training-fold importance, spatial ablation and final feature selection remain pending proposals. No new row removal or methodology change is authorized by this progress note.
 

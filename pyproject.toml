@@ -24,6 +24,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+tuning = ["optuna>=4,<6"]
 dev = ["pytest>=8.0", "pytest-cov>=5.0", "ruff>=0.5"]
 
 [tool.setuptools.packages.find]
