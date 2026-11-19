@@ -1,5 +1,15 @@
 # 07 — Research Backlog and Experiments
 
+## no_engineered follow-up proposals (2026-11-19, latest)
+Training/results review is complete for `ta_20261119T040155Z` (FIND-017; `docs/NO_ENGINEERED.md`). The following are proposed next actions, not approval to change code/configs, retrain, replace frozen C/D, or execute DE:
+- P0 reproducibility: update notebook's legacy 97-input assertion using actual snapshot/bundle schema; adjust optional coordinate permutation before enabling. Current cell 12 stores AssertionError; read-only artifact checks passed independently.
+- P0 surrogate response: diagnose the saved selected CatBoost with fixed scenario state, N/P/K sweeps and pairwise grids; investigate K's cross-model disagreement. No no_engineered response curves have yet been verified. D loader expects frozen C manifests and needs a reviewed adapter/new source preparation for this ordinary training run.
+- P0 scenario semantics: classify fertilizer product rates/concentrations/source categories before dose-only DE; generic optimization currently holds them fixed. Verify compatibility with No fertilizer controls, units and formulation without inventing conversions. Confirm pre-treatment timing of soil features. No new row exclusion is proposed.
+- P0 optimization decisions: preserve the cohort/group design; review baseline, bounds and unresolved yield_scale/lambda_total/lambda_composition with researcher. Only 33 unique training NPK combinations support the joint search domain; report continuous distances/support without inventing cutoff values.
+- P1 after scenario readiness: evaluate DE baseline-versus-candidate predictions with domain, sensitivity and seed stability; plateau/ties can influence recommendations. Report modeled changes, not field effects.
+- P2 optional: same-raw-input derivative-only ablation with matched search seeds/budgets/folds, and fold-training importance if needed. Current before/after comparison changes multiple components; it does not establish masking. More Optuna trials or further feature deletion are not automatic prerequisites.
+
+
 ## Experiment-D progress and remaining decisions (2026-11-17, latest)
 D diagnostics/playground/parameter evidence are implemented under explicit researcher approval. Notebook uses the frozen C model; model/data/config hashes are preserved, and no DE is run. See current_state and FIND-016 for executed evidence. This supersedes the pending response/domain-diagnostic software tasks only; it does not approve optimizer coefficients or establish causal/field validity.
 Remaining priorities: inspect joint dose support and ratio behavior near zero; confirm treatment context (including fertilizer category), management metadata and replicate design before controlled ranking claims; review the worksheet against literature and choose nutrient basis/bounds, total/composition trade-offs, yield scale, baseline policy and warning policy. Final distance cutoff remains undecided. DE stability requires actual optimization/perturbation later. Optional 60-trial tuning or numeric int/float search domains remain future experiments, not necessary automatic next steps.

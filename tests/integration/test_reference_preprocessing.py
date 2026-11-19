@@ -90,3 +90,15 @@ def test_preprocessing_rejects_reference_changes_instead_of_silently_dropping_ro
     with pytest.raises(DataValidationError):
         run_preprocessing(cfg, tmp_path / "run")
     assert not Path(cfg["paths"]["processed_dataset"]).exists()
+
+
+def test_reduced_profile_preserves_unselected_reference_columns(cohort_setup, tmp_path):
+    cfg, _, reference = cohort_setup
+    cfg["features"]["profiles"]["cohort_test"]["numeric"].remove("total_npk")
+    result = run_preprocessing(cfg, tmp_path / "run")
+    processed = pd.read_csv(result["processed_dataset"])
+    pd.testing.assert_frame_equal(processed[reference.columns], reference.reset_index(drop=True))
+    profile = cfg["features"]["profiles"]["cohort_test"]
+    model_inputs = profile["numeric"] + profile["categorical"] + cfg["features"]["decision_features"]
+    assert "total_npk" in processed
+    assert "total_npk" not in model_inputs

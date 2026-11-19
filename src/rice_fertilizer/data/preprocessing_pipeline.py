@@ -157,6 +157,10 @@ def run_preprocessing(configs: dict[str, Any], run_dir: Path) -> dict[str, Path]
             "group_article_experiment_year",
         ] if column in df.columns
     ]
+    if reference is not None:
+        # Keep reference values for lineage even when a reduced model profile
+        # excludes these columns. The trainer selects inputs from the profile.
+        passthrough += list(reference.columns)
     model_df = select_feature_frame(
         df, profile["numeric"], profile["categorical"], target,
         decision_features=decision_features, passthrough_columns=passthrough,

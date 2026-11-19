@@ -1,5 +1,9 @@
 # Experiment B: metadata-based feature importance
 
+> 2026-11-19: Root configs now select the separate `no_engineered` exploratory run.
+> The B settings below are historical; current commands/settings are documented in
+> [NO_ENGINEERED.md](NO_ENGINEERED.md). Existing B artifacts are preserved.
+
 Status: configurations and preprocessing support prepared, 2026-11-17.
 Preprocessing was verified on real data in a temporary directory: 1,000 rows,
 106 dataset columns, 97 model inputs, identical reference values and holdout IDs

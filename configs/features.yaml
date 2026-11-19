@@ -191,6 +191,46 @@ profiles:
       - "fertilizer_type"
       
 
+  # Source: experiment_B/ta_20261116T203731Z, XGBoost built-in importance.
+  # Apply >=0.5% to encoded columns, then map to raw names and deduplicate.
+  # Preserve required N/P/K, initial pH, rainfall, SOC and fertilizer type.
+  no_engineered:
+    description: Exploratory B importance selection without NPK derivatives or coordinates;
+      retain research-required inputs. Not a frozen optimization surrogate.
+    numeric:
+    - exp_year
+    - N.rate.kg_ha
+    - P.rate.kg_ha
+    - K.rate.kg_ha
+    - K.fertilizer.rate.kg_ha
+    - N_fertilizer.conc
+    - P_fertilizer.conc
+    - K_fertilizer.conc
+    - bd.2
+    - bd.3
+    - som.percentage
+    - soc.percentage
+    - n.total.percentage
+    - clay.perc1
+    - clay.perc2
+    - initial.ph.soil
+    - avprec.mm
+    categorical:
+    - crop_rotation
+    - prev_crop
+    - fertilizer_type
+    - N_source
+    - P_source
+    - K_source
+    - soil_type
+    - texture1
+    - som.or.soc.depth
+    - soc.method
+    - n.total.method
+    - clay.depth1
+    - ph.soil_water.ratio
+    - ph.method
+
   feature_importance_candidates:
     description: "Metadata-based exploratory predictors for experiment B; retain missing columns, exclude outcomes/IDs/post-treatment pH/EC. Requires enriched data and numeric parsing; not optimization-ready."
     numeric:

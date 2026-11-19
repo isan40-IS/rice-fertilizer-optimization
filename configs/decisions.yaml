@@ -6,10 +6,10 @@ feature_engineering:
   # Isi dan jelaskan agar pembagian ketika denominator=0 tidak menghasilkan nilai ekstrem.
   ratio_pseudocount: 1e-5
 
-# Experiment B: broad metadata-based candidates on the same 1000 reference IDs.
+# Exploratory no_engineered profile on the same 1000 reference IDs.
 # Diagnostic profile; not an automatically approved optimization surrogate.
 # Pilih salah satu profil pada configs/features.yaml.
-feature_profile: "minimalist_features"
+feature_profile: "no_engineered"
 
 # Contoh: group_kfold. Lihat configs/validation.yaml.
 validation_strategy: "group_kfold"
