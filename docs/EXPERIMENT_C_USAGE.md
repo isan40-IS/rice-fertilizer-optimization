@@ -1,6 +1,6 @@
 # Experiment C: penggunaan implementasi
 
-Status: implementasi tersedia; studi riset penuh **belum dijalankan oleh agen**.
+Status (2026-11-17): implementasi tersedia; peneliti telah menyelesaikan studi Optuna tiga seed. Artefak diperiksa oleh agen.
 Rancangan asal: [EXPERIMENT_C_TUNING_PLAN.md](EXPERIMENT_C_TUNING_PLAN.md).
 
 ## 1. Environment
@@ -64,7 +64,7 @@ Runner **perbandingan C** memilih daftar metode/seed dari
 untuk setiap subrun. Nilai efektif, bukan hanya file dasar, disimpan pada snapshot.
 
 ```yaml
-methods: [random, optuna]
+methods: [optuna]
 search_seeds: [11, 29, 47]
 ```
 
@@ -90,11 +90,8 @@ Opsional: `--config-dir configs/experiment_C`. Notebook
 ubah `RUN_TUNING = True` hanya jika siap. Menjalankan ulang membuat grup baru,
 bukan melanjutkan trial lama. Grafik/analisis tidak otomatis melatih ulang model.
 
-Default: dua model x dua metode x tiga seed x 30 kandidat x lima folds = hingga
-1.800 fold fits; ada refit dan CV pelaporan tambahan. Seluruhnya belum dieksekusi
-pada data penelitian oleh agen. Hentikan/ubah budget **sebelum** mulai jika terlalu
-besar; perbandingan adil memerlukan budget/ruang yang setara, dan timeout dapat
-menghasilkan jumlah trial aktual berbeda yang wajib dilaporkan.
+Konfigurasi aktif: dua model x Optuna x tiga seed x 30 trial x lima fold =
+900 fit CV, ditambah refit dan CV pelaporan. Studi dijalankan oleh peneliti.
 
 Output:
 
@@ -103,7 +100,7 @@ artifacts/experiment_C/exp_C_<timestamp>_<id>/
   experiment_manifest.json
   study_comparison.csv
   frozen_candidate.json
-  random_seed_11/
+  optuna_seed_11/
     config_snapshot/
     training_manifest.json
     splits/cv_assignments.json
@@ -113,8 +110,8 @@ artifacts/experiment_C/exp_C_<timestamp>_<id>/
     models/<model>.joblib
     metrics/model_comparison.csv
     interpretation/<model>_built_in_importance.csv
-  optuna_seed_11/
-  ...
+  optuna_seed_29/
+  optuna_seed_47/
 ```
 
 Search history mencatat parameter, nomor/state, skor tiap fold, mean/std skor,
@@ -148,7 +145,7 @@ jalankan sel analisis:
 5. Baca best parameters dan frekuensi nilainya. Ini analisis hyperparameter,
    bukan importance kolom agronomi; jangan menggabungkan parameter antar-study.
 
-Seluruh hasil pada notebook yang disediakan masih kosong; tidak ada skor C buatan.
+Notebook telah dijalankan oleh peneliti; gunakan GROUP_DIR yang sesuai artefak hasil.
 Manifest/snapshot/version dan dataset hash harus menyertai pelaporan hasil.
 
 ## 5. Kandidat CV dan pelaporan holdout terpisah
@@ -186,3 +183,44 @@ Resume, domain kontinu, nested CV, pruning/early stopping, feature selection dar
 importance dan diagnosis respons NPK sebelum DE belum diimplementasikan oleh tugas
 ini. Dataset/cohort, hasil B, dan koefisien optimasi tidak diubah. Tuning C tidak
 otomatis menetapkan surrogate untuk penggunaan agronomis atau DE.
+
+## 7. Hasil terverifikasi (2026-11-17)
+
+Sumber: `artifacts/experiment_C/exp_C_20261117T055252Z_b321014c/`;
+manifest berstatus `complete`, `study_comparison.csv`, `frozen_candidate.json`,
+dan riwayat/ringkasan pada `*/tuning/`. Angka berikut adalah mean CV, bukan holdout.
+
+| Model | Search seed | RMSE (kg/ha) | MAE (kg/ha) | R2 |
+| --- | ---: | ---: | ---: | ---: |
+| XGBoost | 11 | 1805.25 | 1267.71 | 0.6475 |
+| XGBoost | 29 | 1806.15 | 1261.44 | 0.6478 |
+| XGBoost | 47 | 1810.12 | 1275.49 | 0.6460 |
+| CatBoost | 11 | 1842.69 | 1290.46 | 0.6324 |
+| CatBoost | 29 | 1855.43 | 1302.66 | 0.6262 |
+| CatBoost | 47 | 1841.10 | 1290.61 | 0.6330 |
+
+- Kandidat CV terpilih: XGBoost, search seed 11. SD antarfold: RMSE 519.30,
+  MAE 350.29 kg/ha, R2 0.1640. Seed 29 sedikit lebih baik pada MAE/R2,
+  tetapi aturan seleksi tetap minimum RMSE.
+- Best params kandidat: n_estimators=400, max_depth=3, learning_rate=0.03,
+  subsample=0.6, colsample_bytree=0.6, min_child_weight=3,
+  reg_alpha=0.0, reg_lambda=10.0. Gunakan satu kombinasi utuh.
+- XGBoost memiliki RMSE lebih rendah pada ketiga seed. Rentang skor antarseed
+  kecil dibanding SD antarfold; ini kestabilan pencarian pada fold tetap,
+  bukan bukti signifikansi atau kestabilan terhadap split baru.
+- `best_count` menghitung jumlah study seed yang best params-nya memakai
+  suatu nilai. Bukan jumlah fold/trial menang atau importance parameter.
+- Diagram batang mean dengan error bar menunjukkan +/-1 SD antarfold;
+  garis tersebut bukan confidence interval maupun SD antarseed.
+- Adapter saat ini memakai suggest_categorical untuk daftar nilai, termasuk
+  numerik. Optuna mendukung suggest_int/suggest_float berbatas bawah-atas,
+  tetapi dukungan konfigurasi tersebut belum tersedia pada adapter proyek.
+- Trial terbaik (urutan mulai 1): XGBoost seed 11/29/47 = 17/26/21;
+  CatBoost = 29/23/17. Perbaikan RMSE setelah trial 20 masing-masing
+  0/6.53/18.35 dan 0.57/1.86/0 kg/ha: kurva mulai mendatar,
+  tetapi tidak membuktikan optimum global.
+- Eksperimen 60 trial dengan tiga seed yang sama masih **usulan**, belum
+  dijalankan pada artefak ini. Jika dilakukan, bandingkan best-so-far trial
+  30 dan 60; adapter membuat studi baru karena resume belum didukung.
+- Tidak ditemukan selected_holdout/evaluation.json pada run ini saat audit.
+  CV tuning bukan evaluasi independen; respons NPK perlu diperiksa sebelum DE.

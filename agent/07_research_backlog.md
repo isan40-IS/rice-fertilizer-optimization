@@ -1,5 +1,10 @@
 # 07 — Research Backlog and Experiments
 
+## Experiment-D progress and remaining decisions (2026-11-17, latest)
+D diagnostics/playground/parameter evidence are implemented under explicit researcher approval. Notebook uses the frozen C model; model/data/config hashes are preserved, and no DE is run. See current_state and FIND-016 for executed evidence. This supersedes the pending response/domain-diagnostic software tasks only; it does not approve optimizer coefficients or establish causal/field validity.
+Remaining priorities: inspect joint dose support and ratio behavior near zero; confirm treatment context (including fertilizer category), management metadata and replicate design before controlled ranking claims; review the worksheet against literature and choose nutrient basis/bounds, total/composition trade-offs, yield scale, baseline policy and warning policy. Final distance cutoff remains undecided. DE stability requires actual optimization/perturbation later. Optional 60-trial tuning or numeric int/float search domains remain future experiments, not necessary automatic next steps.
+
+
 ## Experiment-C implementation progress (2026-11-17)
 Multi-backend tuning, seed-study runner, effective snapshots, CV-only candidate freezing, explicit holdout step and notebook C are implemented under the researcher request. 70 tests passed; research studies remain unexecuted. Next: user-run bounded C studies, inspect all seed histories/runtime/eligibility, then response/domain diagnostics for DE. Persistent resume, continuous spaces, pruning, nested CV and further feature exploration remain future work; no new results or agronomic decisions follow from passing software tests.
 

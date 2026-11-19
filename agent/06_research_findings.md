@@ -130,3 +130,12 @@ Do not upgrade a finding's evidence status without checking the cited artifact.
 
 ## Finding Template
 `FIND-XXX | Date | Evidence status | Observation | Source/artifact | Interpretation | Alternative explanations | Limitations | Next verification`.
+
+## FIND-016 - Frozen Experiment-D Diagnostic Evidence
+**Date/status:** Verified, 2026-11-17; model inference only, no training/DE.
+**Source:** `artifacts/experiment_D/exp_D_20261117T123759Z_33092529/` and frozen C candidate `exp_C_20261117T055252Z_b321014c/optuna_seed_11/models/xgboost.joblib`.
+**Predictive observations:** Original 192-row holdout: MAE 1042.95694, RMSE 1466.33000 kg/ha, R2 0.72712062. It is previously inspected holdout, not independent confirmatory evidence. No comparison against old experiments is treated as controlled model/feature ablation.
+**Responsiveness:** Eight deterministically selected training scenarios; one `No fertilizer` control is skipped for positive-dose sweeps to preserve treatment semantics. The remaining seven yield 21 response curves. Median amplitudes across these scenarios: N 4042.80, P 3041.14, K 998.84 kg/ha. These are model-function ranges on exploratory grids, include potentially weak/out-of-range combinations, and are not causal fertilizer effects. Detailed no-verified-violation summaries are exported separately; absence of a range violation does not prove support. State/missingness changes also alter predictions; masking effects are not agronomic effects.
+**Coverage:** Training 808 rows contains only 33 distinct NPK combinations. Leave-one-out nearest distance is zero for 800 rows, so Q50/Q90/Q95 of row-level reference are zero; distinct-combination distance is reported separately. Do not automatically turn those quantiles into a reliability cutoff.
+**Pairing:** 63 one-nutrient and 143 multi-nutrient candidate pairs within holdout groups are descriptive. Zero controlled pairs are approved under default unconfirmed metadata/design policy; repeated doses and incomplete context are not silently aggregated or equated. Thus controlled response ranking remains insufficient evidence, not model failure or a zero performance score.
+**Limits/next:** Current C CSV has 20 columns, limiting management/replicate matching; full metadata enrichment would require a separately reviewed read-only lineage. Review curves/domain evidence and literature/worksheet decisions before optimization. A good aggregate prediction score is not agronomic validation.

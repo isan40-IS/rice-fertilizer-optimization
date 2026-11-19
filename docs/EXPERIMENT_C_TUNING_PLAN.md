@@ -2,12 +2,14 @@
 
 Update implementasi: backend random/grid/Optuna diskret, runner berulang, konfigurasi
 C terpisah dan notebook sudah tersedia. Lihat [petunjuk implementasi aktual](EXPERIMENT_C_USAGE.md).
-Study riset penuh belum dijalankan. Dokumen di bawah mempertahankan rancangan awal;
+Peneliti telah menyelesaikan Optuna 30 trial x 3 seed x 2 model x 5 fold;
+hasil terverifikasi dan batas interpretasi tercatat pada bagian 7 petunjuk penggunaan. Dokumen di bawah mempertahankan rancangan awal;
 resume/storage dan domain kontinu adalah pengembangan tahap berikutnya, bukan
 kemampuan adapter saat ini. Profil C mengikuti konfigurasi peneliti saat implementasi
 (`minimalist_features`).
 
-Tanggal: 2026-11-17. Status: **rancangan, belum diimplementasikan atau dijalankan**.
+Tanggal rancangan: 2026-11-17. Bagian di bawah adalah **rancangan historis**;
+status aktual mengikuti pembaruan di atas. Percobaan 60 trial masih usulan.
 Dokumen ini tidak mengaktifkan Optuna, mengganti konfigurasi, menghapus fitur,
 menginstal dependency, atau menghasilkan skor baru.
 

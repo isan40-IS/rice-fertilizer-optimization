@@ -136,5 +136,12 @@ Corrective work in `07_research_backlog.md` is proposed, not executed or automat
 **Evidence:** `docs/EXPERIMENT_C_USAGE.md`, runner/notebook C and 70 passing tests; no research training execution. The earlier DEC-010 description of random-only implementation is historical; random remains available and no scientific superiority of Optuna is established.
 **Limits:** Phase one accepts finite value lists, TPE without pruning and fresh sequential studies. Persistent resume/continuous domains are not implemented. Three search seeds assess search variability, not independent dataset replication. No final surrogate or agronomic recommendation is adopted.
 
+
+## DEC-019 - Frozen-surrogate Experiment D
+**Date/status:** 2026-11-17; researcher explicitly approved implementation after reviewing the plan and domain policy.
+**Decision:** Diagnose the frozen C candidate without retraining, changing cohort/splits/configs, selecting new features, or running DE. Recompute NPK-derived features for every changed dose. Report continuous training-scaled distances; reserve definitive flags for verified range/category violations, without adopting an arbitrary reliability threshold. Holdout prediction is a diagnostic of previously inspected data. Pairing requires confirmed non-dose context/design; missing information is not evidence of equivalence.
+**Implementation:** Shared scenario/diagnostic helper and experiment_D notebook; optimization worksheet retains unknown literature/final values. The metadata-defined `No fertilizer` control cannot receive positive NPK while keeping the same category. One sampled control is skipped during positive-dose sweeps; no dataset row is deleted.
+**Limits:** No final agronomic suitability threshold, nutrient recommendation, distance cutoff, penalty coefficient or DE approval is implied. Full-training refit from C is loaded, not reconstructed from parameter tables. Historical C and prior research decisions are preserved.
+
 ## Decision Addition Format
 `DEC-XXX — Title | Date | Status | Decision | Evidence | Rationale | Alternatives | Risks | Affected artifacts | Reviewer/approval | Supersedes`.
