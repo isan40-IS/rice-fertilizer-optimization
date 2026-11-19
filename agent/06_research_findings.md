@@ -1,5 +1,12 @@
 # 06 — Research Findings and Diagnostic Evidence
 
+## FIND-018 - Selected legacy XGBoost and input recovery preflight
+**Date/status:** 2026-11-19; verified saved bundle/CSV/JSON/configs and temporary preprocessing/inference checks; no fitting.
+**Source:** artifacts/ta_20261027T232115Z; docs/SURROGATE_SELECTION_ta_20261027T232115Z.json.
+**Observations:** Selected XGBoost has 16 inputs, random_kfold and MICE/median/categorical preprocessing. CV RMSE 1591.015224 (SD 133.776503), R2 0.680139 (SD 0.050166). Holdout RMSE 1649.202029, R2 0.659784, n=337. Saved leakage checks show zero record overlap and 174 shared article-experiment groups. Current configured 1,682-row CSV lacks five required features.
+**Recovery check:** Restored preprocessing in a temporary directory yields 1,682 rows/25 columns. All saved split record IDs/order and holdout targets match. All eight training-numeric sorted observed-value distributions match saved training references. All 337 saved XGBoost holdout predictions reproduce (max absolute error 2.274e-13). Temporary files removed; dataset not exported or overwritten.
+**Interpretation:** The saved inference path and a recoverable compatible input dataset are supported. Original CSV byte identity is unknown because the legacy bundle lacks dataset hashes. Small random-CV variation does not establish cross-experiment generalization or optimization stability. Researcher's stability rationale is distinct from these observations. No NPK response, joint-domain suitability or agronomic validation is established by this preflight.
+
 ## Evidence Standard
 - **Verified:** directly inspected in current data/code/output.
 - **Reported:** researcher described the observation, original output not yet inspected here.

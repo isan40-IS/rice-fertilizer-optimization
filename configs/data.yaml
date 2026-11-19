@@ -18,52 +18,18 @@ identifier_columns:
   year: "year"
   location: "location"
 
-# Numeric source fields; comma decimals are parsed, not imputed.
 numeric_columns:
-  - "rep_lat"
-  - "rep_long"
-  - "near_lat"
-  - "near_long"
-  - "exp_year"
   - "N.rate.kg_ha"
   - "P.rate.kg_ha"
   - "K.rate.kg_ha"
-  - "S.rate.kg_ha"
-  - "N.fertilizer.rate.kg_ha"
-  - "P.fertilizer.rate.kg_ha"
-  - "K.fertilizer.rate.kg_ha"
-  - "S.fertilizer.rate.kg_ha"
-  - "N_fertilizer.conc"
-  - "P_fertilizer.conc"
-  - "K_fertilizer.conc"
-  - "S_fertilizer.conc"
-  - "additional_fertilizer.rate.kg_ha"
-  - "additional_nutrient.rate.kg_ha"
-  - "N.nitrate.soil.layer1"
-  - "N.nitrate.soil.layer2"
-  - "N.nitrate.soil.layer3"
-  - "P.soil.layer2"
-  - "K.soil.layer2"
-  - "K.soil.layer3"
-  - "S.soil.layer1"
-  - "S.soil.layer2"
-  - "S.soil.layer3"
-  - "bd.1"
-  - "bd.2"
-  - "bd.3"
-  - "som.percentage"
-  - "soc.percentage"
-  - "tcoef"
-  - "n.total.percentage"
-  - "clay.perc1"
-  - "clay.perc2"
-  - "initial.ph.soil"
-  - "initial.ec.soil.dS_m"
-  - "avtemp.Cdegree"
-  - "avprec.mm"
-  - "slope.perc"
-  - "elevation.m"
   - "yield.wb.kg_ha"
+  - "avprec.mm"
+  - "initial.ph.soil"
+  - "soc.percentage"
+  - "som.percentage"
+  - "avtemp.Cdegree"
+  - "clay.perc1"
+  - "bd.1"
 
 nutrient_rates:
   N: "N.rate.kg_ha"
@@ -80,17 +46,3 @@ structural_zero:
 runtime_output:
   save_csv: true
   save_parquet: true
-
-# Keep the selected observations and their original labels/values unchanged.
-cohort:
-  mode: reference
-  expected_rows: 1000
-  input_sha256: "58dbf256c33ee31d17a58df77e122e6349afee0c55dcd4ca92584a1350d748d4"
-  reference_sha256: "94ab8b338849d0c46cabbff786e232d233eceaf9f69c74b47297f50ca56e27b6"
-
-# Geographic bounds validate parsed values; no coordinate imputation/coalescing.
-numeric_ranges:
-  rep_lat: {min: -90, max: 90}
-  near_lat: {min: -90, max: 90}
-  rep_long: {min: -180, max: 180}
-  near_long: {min: -180, max: 180}

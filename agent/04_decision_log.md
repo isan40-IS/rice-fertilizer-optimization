@@ -1,5 +1,14 @@
 # 04 — Scientific Decision Log
 
+## DEC-021 - Researcher-selected historical surrogate and snapshot restoration
+**Date/status:** 2026-11-19; Confirmed researcher selection and explicit configuration-restoration request.
+**Decision:** Stop model-performance improvement; use the saved selected XGBoost of `ta_20261027T232115Z` as the active surrogate for the next response/domain checks. Match all eight root YAMLs to that run's snapshot. Do not retrain or silently substitute CatBoost/no_engineered/C/D.
+**Rationale:** Researcher reports this run is stable. This is a stated preference, not independently established optimizer stability or unseen-experiment performance.
+**Verified evidence:** Bundle uses 16-input `modeling_features`, MICE plus median/categorical imputation, and random KFold. XGBoost CV RMSE 1591.015224 +/- 133.776503 kg/ha, CV R2 0.680139 +/- 0.050166; holdout RMSE 1649.202029, R2 0.659784 (337 rows). Saved leakage report: zero record overlap, 174 overlapping article-experiment groups.
+**Supersedes:** DEC-020's active root profile/output; DEC-015's active no-imputation setting; DEC-019's C/D model as the immediate next surrogate diagnostic source; DEC-003's active grouped-validation setting for this explicitly requested historical run only. Their historical scientific evidence/configurations remain intact. This is not a general endorsement of replacing group validation with random CV for higher scores.
+**Implementation:** Five root YAMLs restored; three already identical. Previous changed files backed up under `docs/config_history/2026-11-19_before_ta_20261027T232115Z/`. Exact source/destination equality, schema and imputation resolver verified. Selection/provenance report: `docs/SURROGATE_SELECTION_ta_20261027T232115Z.json`.
+**Limits/open:** Fold SD under random splitting does not demonstrate cross-experiment/causal/DE stability. Active dataset lacks five model inputs; a temporary full-data reconstruction matches saved predictions but was not exported. Fertilizer-source/control semantics, joint support, bounds, baseline and null objective parameters require review before DE. No source model/artifact overwrite, permanent dataset reconstruction, training, response sweeps or DE was performed.
+
 ## Status Vocabulary
 - **Confirmed:** explicitly adopted research decision, subject to future documented revision.
 - **Active experimental:** currently used in the reported experiment, not necessarily final for thesis.
@@ -23,6 +32,7 @@ When a decision changes, preserve the prior entry and link the replacement. Do n
 **Audit 2026-11-17:** Config, notebook and bundles use this target key. Error units are reported as kg/ha; raw-data unit harmonization was not independently audited.
 
 ## DEC-003 — Group-Aware Validation
+**Active-use update 2026-11-19: Superseded for the current surrogate/configuration by DEC-021; historical decision and evidence retained below.**
 **Status:** Confirmed design; reverified in active config, notebook and saved splits on 2026-11-17.
 **Decision:** `group_kfold` and `group_article_experiment` for grouped validation; earlier code uses group-aware holdout.
 **Rationale:** Prevent closely related observations from the same experiment appearing across train/validation boundaries.
@@ -108,6 +118,7 @@ Corrective work in `07_research_backlog.md` is proposed, not executed or automat
 
 
 ## DEC-015 - Config-Controlled No-Imputation Baseline
+**Active-use update 2026-11-19: Superseded for the current surrogate/configuration by DEC-021; historical decision and evidence retained below.**
 **Date:** 2026-11-17, after the repository audit.
 **Status:** Confirmed by explicit researcher instruction; implementation verified, scientific training results pending.
 **Decision:** Centralize imputation selection in `configs/decisions.yaml`, activate `state_imputation.mode: none` with the existing minimalist profile/cohort, preserve optional MICE/advanced-feature settings in an example, and defer broad-feature importance experiments.
@@ -138,12 +149,14 @@ Corrective work in `07_research_backlog.md` is proposed, not executed or automat
 
 
 ## DEC-019 - Frozen-surrogate Experiment D
+**Active-use update 2026-11-19: Superseded for the current surrogate/configuration by DEC-021; historical decision and evidence retained below.**
 **Date/status:** 2026-11-17; researcher explicitly approved implementation after reviewing the plan and domain policy.
 **Decision:** Diagnose the frozen C candidate without retraining, changing cohort/splits/configs, selecting new features, or running DE. Recompute NPK-derived features for every changed dose. Report continuous training-scaled distances; reserve definitive flags for verified range/category violations, without adopting an arbitrary reliability threshold. Holdout prediction is a diagnostic of previously inspected data. Pairing requires confirmed non-dose context/design; missing information is not evidence of equivalence.
 **Implementation:** Shared scenario/diagnostic helper and experiment_D notebook; optimization worksheet retains unknown literature/final values. The metadata-defined `No fertilizer` control cannot receive positive NPK while keeping the same category. One sampled control is skipped during positive-dose sweeps; no dataset row is deleted.
 **Limits:** No final agronomic suitability threshold, nutrient recommendation, distance cutoff, penalty coefficient or DE approval is implied. Full-training refit from C is loaded, not reconstructed from parameter tables. Historical C and prior research decisions are preserved.
 
 ## DEC-020 - Exploratory no_engineered feature profile
+**Active-use update 2026-11-19: Superseded for the current surrogate/configuration by DEC-021; historical decision and evidence retained below.**
 **Date/status:** 2026-11-19; researcher-requested exploratory profile. Preparation verified; researcher-run training/results now verified in `ta_20261119T040155Z` (FIND-017). This is not approval of a replacement final surrogate.
 **Decision:** Apply the experiment-B XGBoost >=0.5% encoded-column threshold, map to original features with the fitted encoder and deduplicate, exclude all NPK derivatives and coordinates, and retain scientifically required N/P/K, initial pH, precipitation, SOC and fertilizer type. Profile `no_engineered` has 31 inputs (17 numeric, 14 categorical). Only initial pH and fertilizer type are additions below the requested threshold.
 **Evidence:** B run `ta_20261116T203731Z`, broad 97-input snapshot/bundle and importance CSV match the notebook's 46-column threshold table. At preparation time a later saved notebook aggregation used an inconsistent 11-input schema; this is historical and was not combined with the broad selection table. The notebook now points to the 31-input no_engineered run; see `docs/NO_ENGINEERED.md`.

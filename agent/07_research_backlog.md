@@ -1,5 +1,14 @@
 # 07 — Research Backlog and Experiments
 
+## Selected-run next actions (2026-11-19; DEC-021)
+Active follow-up is XGBoost ta_20261027T232115Z. Earlier no_engineered/C/D follow-ups remain historical/optional and must not silently replace this selection. Model improvement is stopped by researcher; no additional tuning is a prerequisite.
+- Completed: exact root snapshot restoration with backup; bundle/schema/imputation and leakage inspection; temporary full-data reconstruction and saved-prediction reproduction (FIND-018).
+- P0 next: retain a separately named reconstruction with provenance and the original 1,682 IDs, then bind dataset plus saved bundle explicitly for diagnostics. Avoid overwriting the existing model_dataset.csv or treating absent model columns as all-NaN. Legacy source lacks original dataset hash.
+- P0: adapt/reuse diagnostic logic for an ordinary legacy run (existing D loader requires C manifests); verify fixed state, regenerated NPK features, controls/source categories and supported dose combinations. Start with observed training scenarios and report K response, plateaus and near-zero ratio behavior without invented thresholds.
+- P0 scientific reporting: retain researcher choice while explicitly documenting random CV and 174 shared holdout groups. Do not claim unseen-experiment performance or translate fold stability into optimizer stability. Any new group-aware evaluation is a separate proposal requiring reviewed scope, not an automatic retraining step.
+- P0 before DE: review baseline, empirical/agronomic bounds and still-null yield_scale/lambda_total/lambda_composition. Snapshot restoration does not approve historical provisional bounds or fill missing coefficients.
+- P1: limited DE scenarios and repeated seeds only after scenario/objective readiness; report modeled yield changes, fertilizer use, support and stability, not field-validated effects.
+
 ## no_engineered follow-up proposals (2026-11-19, latest)
 Training/results review is complete for `ta_20261119T040155Z` (FIND-017; `docs/NO_ENGINEERED.md`). The following are proposed next actions, not approval to change code/configs, retrain, replace frozen C/D, or execute DE:
 - P0 reproducibility: update notebook's legacy 97-input assertion using actual snapshot/bundle schema; adjust optional coordinate permutation before enabling. Current cell 12 stores AssertionError; read-only artifact checks passed independently.

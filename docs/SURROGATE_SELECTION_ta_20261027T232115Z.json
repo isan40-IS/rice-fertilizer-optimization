@@ -1,0 +1,154 @@
+{
+  "selected_by": "researcher",
+  "decision_date": "2026-11-19",
+  "run_id": "ta_20261027T232115Z",
+  "model": "xgboost",
+  "researcher_rationale": "stabil; researcher-reported rationale, not independently demonstrated optimization stability",
+  "model_bundle": "artifacts\\ta_20261027T232115Z\\selected_model\\model_bundle.joblib",
+  "model_sha256": "f5dfefefbad187b1fa66c9e042c56e9aec2e76fe41b059bd1adc98480c58cdbf",
+  "source_snapshot_sha256": {
+    "data.yaml": "246b10dc191946cfff1d31bb8be0918c4dc3f2bdbd62039e6532a7235dcd9a28",
+    "decisions.yaml": "c7c62fecdca945d508cddf59834fadd0ec5737237b040388ed98c47af55d66fc",
+    "evaluation.yaml": "b8b62e96592fcc219665bee001b0756c1b113d5325ea05d2df90821df682891f",
+    "features.yaml": "73247b87fedc6887cc34ba76fbbc62bb60658f0178acfe78c147d58b601b2250",
+    "models.yaml": "0f21c52e8b88b4057d082279f838146ded553836891e4dd69a3412a65d02c6b8",
+    "optimization.yaml": "ff771dba6791568dbe3a1449fe7ab0cceca9cd742df481cf6c380a3368bd9213",
+    "paths.yaml": "b7e936bc8d5b3f2aeb3be4afe5af973909baadfa6e704f78db3a6ae6feec940e",
+    "validation.yaml": "a20def9fd4df5835142167db403e6a05825e3a8bcce245a19e231941af7c6941"
+  },
+  "previous_active_config_backup": "docs/config_history/2026-11-19_before_ta_20261027T232115Z",
+  "changed_root_configs": [
+    "data.yaml",
+    "decisions.yaml",
+    "features.yaml",
+    "models.yaml",
+    "paths.yaml"
+  ],
+  "feature_profile": "modeling_features",
+  "feature_columns": [
+    "initial.ph.soil",
+    "avprec.mm",
+    "soc.percentage",
+    "clay.perc1",
+    "total_npk",
+    "ratio_n_p",
+    "ratio_n_k",
+    "ratio_p_k",
+    "soil_type",
+    "fertilizer_type",
+    "N_source",
+    "P_source",
+    "K_source",
+    "N.rate.kg_ha",
+    "P.rate.kg_ha",
+    "K.rate.kg_ha"
+  ],
+  "validation_strategy": "random_kfold",
+  "cv_summary": {
+    "mae_mean": 1128.1084686961703,
+    "mae_std": 99.18250148494201,
+    "rmse_mean": 1591.0152244069382,
+    "rmse_std": 133.77650262476158,
+    "r2_mean": 0.6801393190425367,
+    "r2_std": 0.05016561820380059
+  },
+  "holdout_metrics": {
+    "mae": 1154.524843274192,
+    "rmse": 1649.202028698,
+    "r2": 0.659784052614251,
+    "n": 337
+  },
+  "best_params": {
+    "model__subsample": 1.0,
+    "model__reg_lambda": 1.0,
+    "model__reg_alpha": 0.0,
+    "model__n_estimators": 1000,
+    "model__min_child_weight": 1,
+    "model__max_depth": 4,
+    "model__learning_rate": 0.01,
+    "model__colsample_bytree": 0.6
+  },
+  "split_counts": {
+    "train": 1345,
+    "test": 337
+  },
+  "leakage_checks": {
+    "record_overlap": {
+      "overlap_count": 0,
+      "passed": true
+    },
+    "group_overlap": {
+      "group_column": "group_article_experiment",
+      "overlap_count": 174,
+      "overlap_examples": [
+        "17::10",
+        "17::11",
+        "17::14",
+        "17::15",
+        "17::16",
+        "17::17",
+        "17::18",
+        "17::19",
+        "17::21",
+        "17::22",
+        "17::23",
+        "17::24",
+        "17::25",
+        "17::26",
+        "17::27",
+        "17::28",
+        "17::29",
+        "17::3",
+        "17::30",
+        "17::31"
+      ],
+      "passed": false
+    }
+  },
+  "configured_dataset": "data/processed/model_dataset.csv",
+  "configured_dataset_sha256": "a4e0952b7212e3d74675675c7d1a974ec0506f8d2590827b8bf53f0343c6abd7",
+  "current_dataset_rows": 1682,
+  "missing_model_features": [
+    "K_source",
+    "N_source",
+    "P_source",
+    "clay.perc1",
+    "soil_type"
+  ],
+  "ready_for_scenario_inference": false,
+  "open_objective_parameters": [
+    "yield_scale",
+    "lambda_total",
+    "lambda_composition"
+  ],
+  "limitations": [
+    "Legacy bundle has no original dataset hash/provenance manifest.",
+    "random_kfold and group overlap do not establish unseen-experiment generalization.",
+    "CV fold SD is not evidence of DE seed/input stability.",
+    "Restored YAML does not retrain or exactly reproduce an old software environment."
+  ],
+  "next_steps": [
+    "Recover and verify the original model-input dataset without overwriting current data or deleting rows.",
+    "Reproduce saved holdout predictions and training numeric references before scenario diagnostics.",
+    "Run fixed-state NPK response and joint-domain diagnostics with this exact saved pipeline.",
+    "Review fertilizer-source/control semantics, then approve bounds, baseline and objective coefficients before DE."
+  ],
+  "temporary_reconstruction_check": {
+    "rows": 1682,
+    "columns": 25,
+    "record_ids_and_order_match": true,
+    "holdout_targets_match": true,
+    "holdout_prediction_max_abs_error": 2.2737367544323206e-13,
+    "training_numeric_sorted_values_match": {
+      "initial.ph.soil": true,
+      "avprec.mm": true,
+      "soc.percentage": true,
+      "clay.perc1": true,
+      "total_npk": true,
+      "ratio_n_p": true,
+      "ratio_n_k": true,
+      "ratio_p_k": true
+    },
+    "exported_dataset": false
+  }
+}
